@@ -80,7 +80,7 @@ public :
 InputMethod::InputMethod( MAbstractInputMethodHost *host, QWidget *mainWindow ) : MAbstractInputMethod( host, mainWindow ), d_ptr( new InputMethodPrivate( this, mainWindow ) ) {
     qDebug() << "inputmethod" << "construct" ;
     Q_D( InputMethod ) ;
-    d->load( "/usr/share/cuteinputmethod/maliit/qml/main.qml" ) ;
+    d->load( "/home/developer/qml/main.qml" ) ;
 
     QWidget* viewport = d->view->viewport() ;
 
@@ -200,8 +200,16 @@ void InputMethod::switchContext( MInputMethod::SwitchDirection direction, bool e
 
 QList<InputMethod::MInputMethodSubView> InputMethod::subViews( MInputMethod::HandlerState state ) const {
     qDebug() << "inputmethod" << "subViews" ;
-    Q_UNUSED( state )
-    return QList<InputMethod::MInputMethodSubView>() ;
+
+    QList<MAbstractInputMethod::MInputMethodSubView> list ;
+    if ( state == MInputMethod::OnScreen ) {
+        MAbstractInputMethod::MInputMethodSubView subView ;
+        subView.subViewId = 3000 ;
+        subView.subViewTitle = "cuteinputmethod" ;
+        list.append(subView) ;
+    }
+
+    return list;
 }
 
 void InputMethod::setActiveSubView( const QString &subViewId, MInputMethod::HandlerState state ) {

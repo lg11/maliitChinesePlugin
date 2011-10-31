@@ -7,6 +7,7 @@
 #include <QSet>
 
 #include <minputmethodplugin.h>
+#include <mabstractinputmethodsettings.h>
 
 namespace plugin {
 
@@ -17,6 +18,8 @@ class Plugin : public QObject, public MInputMethodPlugin {
     Q_INTERFACES( MInputMethodPlugin )
 
 public :
+    MAbstractInputMethodSettings* settings ;
+
     Plugin() ;
     virtual ~Plugin() ;
 

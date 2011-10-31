@@ -4,6 +4,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 CONFIG += meegoimframework
+CONFIG += meegotouch
 ;CONFIG += meegoimquick
 
 QT = core gui declarative
@@ -13,7 +14,7 @@ TARGET = cuteinputmethod
 OBJECTS_DIR = .tmp
 MOC_DIR = .tmp
 
-INCLUDEPATH += ./inputmethod
+INCLUDEPATH += ./inputmethod ./settings
 
-HEADERS += plugin.h ./inputmethod/inputmethod.h
-SOURCES += plugin.cpp ./inputmethod/inputmethod.cpp
+HEADERS += plugin.h ./inputmethod/inputmethod.h ./settings/settings.h ./settings/widget.h
+SOURCES += plugin.cpp ./inputmethod/inputmethod.cpp ./settings/settings.cpp

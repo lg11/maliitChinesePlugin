@@ -1,5 +1,6 @@
 #include "plugin.h"
 #include "inputmethod.h"
+#include "settings.h"
 
 namespace plugin {
 
@@ -14,13 +15,19 @@ public :
         this->supportedStates << MInputMethod::Hardware ;
         this->supportedStates << MInputMethod::OnScreen ;
     }
+    ~PluginPrivate() {}
 } ;
 
 Plugin::Plugin() : d_ptr( new PluginPrivate ) {
-    //qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.meego.inputmethod", 1, 0, "InputMethod", "There's only one controller and it is in the C++ side" ) ;
+    this->settings = 0 ;
+    //qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.inputmethod", 1, 0, "InputMethod", "inputmethod" ) ;
 }
 
-Plugin::~Plugin() { delete this->d_ptr ; }
+Plugin::~Plugin() {
+    if ( this->settings )
+        delete this->settings ;
+    delete this->d_ptr ;
+}
 
 QString Plugin::name() const {
     Q_D( const Plugin ) ;
@@ -37,7 +44,9 @@ MAbstractInputMethod* Plugin::createInputMethod( MAbstractInputMethodHost *host,
 }
 
 MAbstractInputMethodSettings* Plugin::createInputMethodSettings() {
-    return NULL ;
+    if ( !this->settings )
+        this->settings = new settings::Settings ;
+    return this->settings ;
 }
 
 QSet<MInputMethod::HandlerState> Plugin::supportedStates() const {
