@@ -4,7 +4,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 CONFIG += meegoimframework
-CONFIG += meegoimquick
+;CONFIG += meegoimquick
 
 QT = core gui declarative
 
