@@ -10,10 +10,10 @@ QT = core gui declarative
 
 TARGET = cuteinputmethod
 
-OBJECTS_DIR = tmp
-MOC_DIR = tmp
+OBJECTS_DIR = .tmp
+MOC_DIR = .tmp
 
-#INCLUDEPATH += /usr/include/meegoimquick /usr/include/meegoimframework /usr/include/meego-keyboard
+INCLUDEPATH += ./inputmethod
 
-HEADERS += plugin.h inputmethod.h
-SOURCES += plugin.cpp inputmethod.cpp
+HEADERS += plugin.h ./inputmethod/inputmethod.h
+SOURCES += plugin.cpp ./inputmethod/inputmethod.cpp
