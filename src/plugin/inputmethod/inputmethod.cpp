@@ -1,4 +1,5 @@
 #include "inputmethod.h"
+#include "toolbar.h"
 
 #include <QGraphicsView>
 #include <QGraphicsObject>
@@ -18,6 +19,8 @@
 
 #include <QDebug>
 
+#include <MLabel>
+
 namespace inputmethod {
 
 const QRect& display_rect( QWidget* widget = NULL ) {
@@ -35,16 +38,22 @@ public :
     QGraphicsObject* content ;
     QDeclarativeComponent* component ;
     QRect inputMethodArea ;
+    int appOrientation ;
     QRect cursorRect ;
+    toolbar::Toolbar* toolbar ;
     
     InputMethodPrivate( InputMethod* inputmethod, QWidget* mainWindow ) :
         q_ptr( inputmethod ) ,
-        scene( new QGraphicsScene( display_rect(), inputmethod ) ),
+        scene( new QGraphicsScene( display_rect(), inputmethod ) ) ,
         view( new MImGraphicsView( this->scene, mainWindow ) ) ,
-        engine( new QDeclarativeEngine( inputmethod ) ),
-        content( NULL ),
-        component( NULL )
+        engine( new QDeclarativeEngine( inputmethod ) ) ,
+        content( NULL ) ,
+        component( NULL ) ,
+        appOrientation( 0 ) ,
+        cursorRect() ,
+        toolbar( new toolbar::Toolbar() )
     {
+        this->scene->addItem( this->toolbar ) ;
         this->engine->rootContext()->setContextProperty( "inputmethod", inputmethod ) ;
     }
 
@@ -55,16 +64,19 @@ public :
             delete this->component ;
         delete this->engine ;
         delete this->view ;
+        delete this->toolbar ;
     }
 
     void show() {
         if ( this->content )
             this->content->show() ;
+        this->toolbar->show() ;
     }
 
     void hide() {
         if ( this->content )
             this->content->hide() ;
+        this->toolbar->hide() ;
     }
 
     void load( const QString& path ) {
@@ -164,7 +176,12 @@ void InputMethod::handleAppOrientationAboutToChange( int angle ) {
 
 void InputMethod::handleAppOrientationChanged( int angle) {
     qDebug() << "inputmethod" << "handleAppOrientationChanged" ;
-    Q_UNUSED( angle ) 
+    Q_D( InputMethod ) ;
+    
+    if ( d->appOrientation != angle ) {
+        d->appOrientation = angle ;
+        emit this->appOrientationChanged( d->appOrientation ) ;
+    }
 }
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
@@ -204,7 +221,7 @@ QList<InputMethod::MInputMethodSubView> InputMethod::subViews( MInputMethod::Han
     QList<MAbstractInputMethod::MInputMethodSubView> list ;
     if ( state == MInputMethod::OnScreen ) {
         MAbstractInputMethod::MInputMethodSubView subView ;
-        subView.subViewId = 3000 ;
+        subView.subViewId = 250 ;
         subView.subViewTitle = "cuteinputmethod" ;
         list.append(subView) ;
     }
@@ -247,6 +264,11 @@ int InputMethod::screenHeight() {
     return display_rect().height() ;
 }
 
+int InputMethod::appOrientation() {
+    Q_D( InputMethod ) ;
+    return d->appOrientation ;
+}
+
 QRect& InputMethod::cursorRect() {
     Q_D( InputMethod ) ;
     return d->cursorRect ;
@@ -262,8 +284,8 @@ void InputMethod::setInputMethodArea( const QRect &area ) {
     Q_D( InputMethod ) ;
     if ( d->inputMethodArea != area ) {
         d->inputMethodArea = area ;
-        //QRegion region( d->inputMethodArea ) ;
-        //this->inputMethodHost()->setInputMethodArea( region ) ;
+        QRegion region( d->inputMethodArea ) ;
+        this->inputMethodHost()->setInputMethodArea( region ) ;
     }
 }
 

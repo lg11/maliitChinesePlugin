@@ -13,11 +13,13 @@ class InputMethod : public MAbstractInputMethod {
     Q_OBJECT
     Q_PROPERTY( int screenWidth READ screenWidth NOTIFY screenWidthChanged )
     Q_PROPERTY( int screenHeight READ screenHeight NOTIFY screenHeightChanged )
+    Q_PROPERTY( int appOrientation READ appOrientation NOTIFY appOrientationChanged )
     Q_PROPERTY( QRect cursorRect READ cursorRect NOTIFY cursorRectChanged )
 
 signals :
     void screenWidthChanged( int width ) ;
     void screenHeightChanged( int height ) ;
+    void appOrientationChanged( int angle ) ;
     void cursorRectChanged( QRect& cursorRect ) ;
     //void keyEvent() ;
 
@@ -34,7 +36,7 @@ public :
     virtual void handleFocusChange( bool focusIn ) ;
     virtual void handleVisualizationPriorityChange( bool priority ) ;
     virtual void handleAppOrientationAboutToChange( int angle ) ;
-    virtual void handleAppOrientationChanged( int angle) ;
+    virtual void handleAppOrientationChanged( int angle ) ;
     virtual void setToolbar( QSharedPointer<const MToolbarData> toolbar ) ;
     virtual void processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count, quint32 nativeScanCode, quint32 nativeModifiers, unsigned long time) ;
     virtual void setState( const QSet<MInputMethod::HandlerState> &state ) ;
@@ -49,10 +51,13 @@ public :
 
     int screenWidth() ;
     int screenHeight() ;
+    int appOrientation() ;
     QRect& cursorRect() ;
-    Q_INVOKABLE void setScreenRegion( const QRect &area ) ;
-    Q_INVOKABLE void setInputMethodArea( const QRect &area ) ;
-    Q_INVOKABLE void sendCommit( const QString& text ) ;
+
+public slots:
+    void setScreenRegion( const QRect &area ) ;
+    void setInputMethodArea( const QRect &area ) ;
+    void sendCommit( const QString& text ) ;
 
 private :
     Q_DISABLE_COPY( InputMethod ) ;

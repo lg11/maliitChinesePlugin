@@ -9,23 +9,25 @@ public :
     QString name ;
     QStringList languages ;
     QSet<MInputMethod::HandlerState> supportedStates ;
+    MAbstractInputMethodSettings* settings ;
     PluginPrivate() {
         this->name = "cuteinputmethod" ;
         this->languages << "en" << "zh" << "en_GB" << "en_US" << "zh_CN" ;
         this->supportedStates << MInputMethod::Hardware ;
         this->supportedStates << MInputMethod::OnScreen ;
+        this->settings = 0 ;
     }
-    ~PluginPrivate() {}
+    ~PluginPrivate() {
+        if ( this->settings )
+            delete this->settings ;
+    }
 } ;
 
 Plugin::Plugin() : d_ptr( new PluginPrivate ) {
-    this->settings = 0 ;
     //qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.inputmethod", 1, 0, "InputMethod", "inputmethod" ) ;
 }
 
 Plugin::~Plugin() {
-    if ( this->settings )
-        delete this->settings ;
     delete this->d_ptr ;
 }
 
@@ -44,9 +46,10 @@ MAbstractInputMethod* Plugin::createInputMethod( MAbstractInputMethodHost *host,
 }
 
 MAbstractInputMethodSettings* Plugin::createInputMethodSettings() {
-    if ( !this->settings )
-        this->settings = new settings::Settings ;
-    return this->settings ;
+    Q_D( Plugin ) ;
+    if ( !d->settings )
+        d->settings = new settings::Settings ;
+    return d->settings ;
 }
 
 QSet<MInputMethod::HandlerState> Plugin::supportedStates() const {
