@@ -5,7 +5,8 @@
 #include <QGraphicsItem>
 #include <QGraphicsLinearLayout>
 #include <MWidget>
-#include <MToolbarItem>
+#include <mtoolbardata.h>
+#include <mtoolbaritem.h>
 
 namespace toolbar {
 
@@ -13,11 +14,17 @@ class Toolbar : public MWidget {
     Q_OBJECT
 public :
     QGraphicsLinearLayout* layout ;
+    QGraphicsLinearLayout* left ;
+    QGraphicsLinearLayout* right ;
+    QGraphicsLinearLayout* center ;
 
     explicit Toolbar( QGraphicsItem* parent = 0 ) ;
     ~Toolbar() ;
 
-    void appendItem( const QSharedPointer<MToolbarItem>& item ) ;
+    //void append( const QSharedPointer<MToolbarItem>& item ) ;
+    void createWidget( const QSharedPointer<MToolbarItem> &item ) ;
+    void set( QSharedPointer<const MToolbarData> toolbar, M::Orientation appOrientation ) ;
+    void setWidth( qreal width ) ;
 } ;
 
 }

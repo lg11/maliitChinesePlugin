@@ -24,7 +24,7 @@ QString Settings::icon() {
 
 QGraphicsWidget *Settings::createContentWidget( QGraphicsWidget *parent ) {
     //qDebug() << "createContentWidget()" ;
-    return new widget::Widget( this, parent) ;
+    return new Widget( this, parent) ;
 }
 
 QStringList Settings::selectedKeyboards() const {

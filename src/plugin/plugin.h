@@ -18,7 +18,7 @@ class Plugin : public QObject, public MInputMethodPlugin {
     Q_INTERFACES( MInputMethodPlugin )
 
 public :
-    Plugin() ;
+    explicit Plugin() ;
     virtual ~Plugin() ;
 
     virtual QString name() const ;

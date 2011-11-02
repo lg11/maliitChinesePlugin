@@ -6,14 +6,14 @@
 
 class MAbstractInputMethodSettings ;
 
-namespace widget {
+namespace settings {
 
 class Widget : public QGraphicsWidget {
     Q_OBJECT
 public :
     MAbstractInputMethodSettings* settings ;
 
-    Widget( MAbstractInputMethodSettings* settings, QGraphicsItem* parent = 0 ) : QGraphicsWidget( parent ) {
+    explicit Widget( MAbstractInputMethodSettings* settings, QGraphicsItem* parent = 0 ) : QGraphicsWidget( parent ) {
         this->settings = settings ;
     }
 } ;

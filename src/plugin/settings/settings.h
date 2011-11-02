@@ -13,7 +13,7 @@ class Settings : public QObject, public MAbstractInputMethodSettings {
 public :
     MGConfItem enabledKeyboardsConf ;
 
-    Settings() ;
+    explicit Settings() ;
     ~Settings() ;
 
     virtual QString title() ;

@@ -22,6 +22,8 @@
 
 #include <QDebug>
 
+#include <QTextStream>
+
 #include <MLabel>
 
 namespace inputmethod {
@@ -58,6 +60,22 @@ public :
         debugString() ,
         toolbar( new toolbar::Toolbar() )
     {
+        //ok = connect(imToolbar, SIGNAL(copyPasteRequest(CopyPasteState)),
+                     //this, SLOT(sendCopyPaste(CopyPasteState)));
+        //Q_ASSERT(ok);
+        //ok = connect(imToolbar, SIGNAL(sendKeyEventRequest(const QKeyEvent &)),
+                     //this, SLOT(sendKeyEvent(const QKeyEvent &)));
+        //Q_ASSERT(ok);
+        //ok = connect(imToolbar, SIGNAL(sendStringRequest(const QString &)),
+                     //this, SLOT(sendStringFromToolbar(const QString &)));
+        //Q_ASSERT(ok);
+        //ok = connect(imToolbar, SIGNAL(copyPasteClicked(CopyPasteState)),
+                     //this, SLOT(sendCopyPaste(CopyPasteState)));
+        //Q_ASSERT(ok);
+        //ok = connect(imToolbar, SIGNAL(closeKeyboardRequest()),
+                     //this, SLOT(userHide()));
+        //Q_ASSERT(ok);
+
         this->scene->addItem( this->toolbar ) ;
         this->engine->rootContext()->setContextProperty( "inputmethod", inputmethod ) ;
     }
@@ -185,24 +203,22 @@ void InputMethod::handleAppOrientationChanged( int angle) {
     
     if ( d->appOrientation != angle ) {
         d->appOrientation = angle ;
+        d->toolbar->setRotation( angle ) ;
         emit this->appOrientationChanged( d->appOrientation ) ;
     }
 }
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
     Q_D( InputMethod ) ;
-    M::Orientation orientation = d->appOrientation == 0 ? M::Landscape : M::Portrait ;
-    QSharedPointer<const MToolbarLayout> layout = toolbar->layout(static_cast<MInputMethod::Orientation>(orientation));
-
-    if (layout.isNull()) {
-        return; 
-    }
-
-    d->debugString = "item : " ;
-    foreach (QSharedPointer<MToolbarItem> item, layout->items()) {
-        d->debugString += item->text() ;
-        d->debugString += " | " ;
-    }
+    if ( d->appOrientation == 0 )
+        d->toolbar->set( toolbar, M::Landscape ) ;
+    else if ( d->appOrientation == 270 ) 
+        d->toolbar->set( toolbar, M::Portrait ) ;
+    
+    d->debugString.clear() ;
+    QTextStream stream( &(d->debugString) ) ;
+    QRectF rect( d->toolbar->rect() ) ;
+    stream << rect.x() << "," << rect.y() << "," << rect.width() << "," << rect.height() ;
     emit this->debugStringChanged( d->debugString ) ;
 }
 
@@ -298,15 +314,26 @@ const QString& InputMethod::debugString() {
 }
 
 void InputMethod::setScreenRegion( const QRect &area ) {
-    //Q_D( InputMethod ) ;
     QRegion region( area ) ;
     this->inputMethodHost()->setScreenRegion( region ) ;
 }
 
 void InputMethod::setInputMethodArea( const QRect &area ) {
     Q_D( InputMethod ) ;
-    if ( d->inputMethodArea != area ) {
-        d->inputMethodArea = area ;
+    QRect rect( area ) ;
+    if ( d->appOrientation == 0 ) {
+        rect.setRect( rect.x(), rect.y() - d->toolbar->rect().height(), rect.width(), rect.height() + d->toolbar->rect().height() ) ;
+        d->toolbar->setWidth( this->screenWidth() ) ;
+        d->toolbar->setPos( rect.topLeft() ) ;
+    }
+    else {
+        rect.setRect( rect.x() - d->toolbar->rect().height(), rect.y(), rect.width() + d->toolbar->rect().height(), rect.height() ) ;
+        d->toolbar->setWidth( this->screenHeight() ) ;
+        d->toolbar->setPos( rect.bottomLeft() ) ;
+    }
+    
+    if ( d->inputMethodArea != rect ) {
+        d->inputMethodArea = rect ;
         QRegion region( d->inputMethodArea ) ;
         this->inputMethodHost()->setInputMethodArea( region ) ;
     }
