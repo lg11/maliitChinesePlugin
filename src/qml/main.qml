@@ -29,7 +29,7 @@ Rectangle {
             Text {
                 id : display
                 anchors.centerIn : parent
-                text : ""
+                text : inputmethod.debugString
                 font.pointSize: 16
                 color : "white"
             }
@@ -46,14 +46,14 @@ Rectangle {
             root.width = canvas.width
             root.height = canvas.height
             var pos = root.mapToItem( canvas, panel.x, panel.y )
-            display.text = "0\n" + pos.x + "," + pos.y + "," + panel.width + "," + panel.height
+            /*display.text = "0\n" + pos.x + "," + pos.y + "," + panel.width + "," + panel.height + "\n" + inputmethod.debugString*/
             inputmethod.setInputMethodArea( Qt.rect( pos.x, pos.y, panel.width, panel.height ) )
         }
         else if ( angle == 270 ) {
             root.width = canvas.height
             root.height = canvas.width
             var pos = root.mapToItem( canvas, panel.x + panel.width, panel.y )
-            display.text = "270\n" + pos.x + "," + pos.y + "," + panel.height + "," + panel.width
+            /*display.text = "270\n" + pos.x + "," + pos.y + "," + panel.height + "," + panel.width + "\n" + inputmethod.debugString*/
             inputmethod.setInputMethodArea( Qt.rect( pos.x, pos.y, panel.height, panel.width ) )
         }
     }

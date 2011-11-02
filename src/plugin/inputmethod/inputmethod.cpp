@@ -16,6 +16,9 @@
 
 #include <mabstractinputmethodhost.h>
 #include <mimgraphicsview.h>
+#include <mtoolbardata.h>
+#include <mtoolbaritem.h>
+#include <mtoolbarlayout.h>
 
 #include <QDebug>
 
@@ -40,6 +43,7 @@ public :
     QRect inputMethodArea ;
     int appOrientation ;
     QRect cursorRect ;
+    QString debugString ;
     toolbar::Toolbar* toolbar ;
     
     InputMethodPrivate( InputMethod* inputmethod, QWidget* mainWindow ) :
@@ -51,6 +55,7 @@ public :
         component( NULL ) ,
         appOrientation( 0 ) ,
         cursorRect() ,
+        debugString() ,
         toolbar( new toolbar::Toolbar() )
     {
         this->scene->addItem( this->toolbar ) ;
@@ -185,7 +190,20 @@ void InputMethod::handleAppOrientationChanged( int angle) {
 }
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
-    Q_UNUSED( toolbar )
+    Q_D( InputMethod ) ;
+    M::Orientation orientation = d->appOrientation == 0 ? M::Landscape : M::Portrait ;
+    QSharedPointer<const MToolbarLayout> layout = toolbar->layout(static_cast<MInputMethod::Orientation>(orientation));
+
+    if (layout.isNull()) {
+        return; 
+    }
+
+    d->debugString = "item : " ;
+    foreach (QSharedPointer<MToolbarItem> item, layout->items()) {
+        d->debugString += item->text() ;
+        d->debugString += " | " ;
+    }
+    emit this->debugStringChanged( d->debugString ) ;
 }
 
 void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count, quint32 nativeScanCode, quint32 nativeModifiers, unsigned long time) {
@@ -269,9 +287,14 @@ int InputMethod::appOrientation() {
     return d->appOrientation ;
 }
 
-QRect& InputMethod::cursorRect() {
-    Q_D( InputMethod ) ;
+const QRect& InputMethod::cursorRect() {
+    Q_D( const InputMethod ) ;
     return d->cursorRect ;
+}
+
+const QString& InputMethod::debugString() {
+    Q_D( const InputMethod ) ;
+    return d->debugString ;
 }
 
 void InputMethod::setScreenRegion( const QRect &area ) {

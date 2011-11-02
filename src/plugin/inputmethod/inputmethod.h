@@ -15,12 +15,14 @@ class InputMethod : public MAbstractInputMethod {
     Q_PROPERTY( int screenHeight READ screenHeight NOTIFY screenHeightChanged )
     Q_PROPERTY( int appOrientation READ appOrientation NOTIFY appOrientationChanged )
     Q_PROPERTY( QRect cursorRect READ cursorRect NOTIFY cursorRectChanged )
+    Q_PROPERTY( QString debugString READ debugString NOTIFY debugStringChanged )
 
 signals :
     void screenWidthChanged( int width ) ;
     void screenHeightChanged( int height ) ;
     void appOrientationChanged( int angle ) ;
-    void cursorRectChanged( QRect& cursorRect ) ;
+    void cursorRectChanged( const QRect& cursorRect ) ;
+    void debugStringChanged( const QString& debugString ) ;
     //void keyEvent() ;
 
 public :
@@ -52,7 +54,8 @@ public :
     int screenWidth() ;
     int screenHeight() ;
     int appOrientation() ;
-    QRect& cursorRect() ;
+    const QRect& cursorRect() ;
+    const QString& debugString() ;
 
 public slots:
     void setScreenRegion( const QRect &area ) ;
