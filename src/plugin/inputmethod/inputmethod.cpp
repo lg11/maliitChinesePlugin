@@ -210,6 +210,8 @@ void InputMethod::handleAppOrientationChanged( int angle) {
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
     Q_D( InputMethod ) ;
+    if ( !toolbar ) 
+        return ;
     if ( d->appOrientation == 0 )
         d->toolbar->set( toolbar, M::Landscape ) ;
     else if ( d->appOrientation == 270 ) 
@@ -320,21 +322,22 @@ void InputMethod::setScreenRegion( const QRect &area ) {
 
 void InputMethod::setInputMethodArea( const QRect &area ) {
     Q_D( InputMethod ) ;
-    QRect rect( area ) ;
-    if ( d->appOrientation == 0 ) {
-        rect.setRect( rect.x(), rect.y() - d->toolbar->rect().height(), rect.width(), rect.height() + d->toolbar->rect().height() ) ;
-        d->toolbar->setWidth( this->screenWidth() ) ;
-        d->toolbar->setPos( rect.topLeft() ) ;
-    }
-    else {
-        rect.setRect( rect.x() - d->toolbar->rect().height(), rect.y(), rect.width() + d->toolbar->rect().height(), rect.height() ) ;
-        d->toolbar->setWidth( this->screenHeight() ) ;
-        d->toolbar->setPos( rect.bottomLeft() ) ;
-    }
+    if ( d->inputMethodArea != area ) {
+        d->inputMethodArea = area ;
+        QRect rect( area ) ;
+
+        if ( d->appOrientation == 0 ) {
+            rect.setRect( rect.x(), rect.y() - d->toolbar->rect().height(), rect.width(), rect.height() + d->toolbar->rect().height() ) ;
+            d->toolbar->setWidth( this->screenWidth() ) ;
+            d->toolbar->setPos( rect.topLeft() ) ;
+        }
+        else {
+            rect.setRect( rect.x() - d->toolbar->rect().height(), rect.y(), rect.width() + d->toolbar->rect().height(), rect.height() ) ;
+            d->toolbar->setWidth( this->screenHeight() ) ;
+            d->toolbar->setPos( rect.bottomLeft() ) ;
+        }
     
-    if ( d->inputMethodArea != rect ) {
-        d->inputMethodArea = rect ;
-        QRegion region( d->inputMethodArea ) ;
+        QRegion region( rect ) ;
         this->inputMethodHost()->setInputMethodArea( region ) ;
     }
 }

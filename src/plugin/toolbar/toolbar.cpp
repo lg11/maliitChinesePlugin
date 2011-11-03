@@ -30,6 +30,17 @@ Toolbar::Toolbar( QGraphicsItem* parent ) : \
     this->center->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed ) ;
 
     this->setLayout( this->layout ) ;
+
+    this->layout->setSpacing( 0 ) ;
+    this->layout->setContentsMargins( 0, 0, 0, 0 ) ;
+    this->left->setSpacing( 0 ) ;
+    this->left->setContentsMargins( 0, 0, 0, 0 ) ;
+    this->right->setSpacing( 0 ) ;
+    this->right->setContentsMargins( 0, 0, 0, 0 ) ;
+    this->center->setSpacing( 0 ) ;
+    this->center->setContentsMargins( 0, 0, 0, 0 ) ;
+
+    this->center->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) ;
 }
 
 Toolbar::~Toolbar() {}
@@ -91,17 +102,17 @@ void Toolbar::set( QSharedPointer<const MToolbarData> toolbar, M::Orientation ap
         return;
     }
 
-    this->center->addStretch() ;
+    //this->center->addStretch() ;
     foreach( QSharedPointer<MToolbarItem> item, layout->items() ) {
         this->createWidget( item ) ;
     }
-    this->left->addStretch() ;
-    this->right->addStretch() ;
-    this->center->addStretch() ;
+    //this->left->addStretch() ;
+    //this->right->addStretch() ;
+    //this->center->addStretch() ;
 }
 
 void Toolbar::setWidth( qreal width ) {
-    this->resize( width, this->layout->preferredHeight() ) ;
+    this->resize( width, 40 ) ;
 }
 
 }

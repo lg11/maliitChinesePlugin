@@ -20,11 +20,10 @@ HEADERS += \
 	plugin.h \
 	./inputmethod/inputmethod.h \
 	./settings/settings.h ./settings/widget.h \
-	./toolbar/toolbar.h ./toolbar/button.h
+	./toolbar/toolbar.h ./toolbar/button.h ./toolbar/item.h
 	
 SOURCES += \
 	plugin.cpp \
 	./inputmethod/inputmethod.cpp \
 	./settings/settings.cpp \
-	./toolbar/toolbar.cpp ./toolbar/button.cpp
-
+	./toolbar/toolbar.cpp ./toolbar/button.cpp ./toolbar/item.cpp

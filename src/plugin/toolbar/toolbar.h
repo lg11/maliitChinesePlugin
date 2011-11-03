@@ -2,11 +2,13 @@
 #define TOOLBAR_H
 
 #include <QObject>
+#include <QGraphicsWidget>
 #include <QGraphicsItem>
 #include <QGraphicsLinearLayout>
-#include <MWidget>
+
 #include <mtoolbardata.h>
 #include <mtoolbaritem.h>
+#include <mwidget.h>
 
 namespace toolbar {
 

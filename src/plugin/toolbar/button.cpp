@@ -4,6 +4,8 @@
 #include <MButtonView>
 #include <mtoolbaritem.h>
 
+#include <QDebug>
+
 namespace toolbar {
 
 class ButtonPrivate {
@@ -31,6 +33,10 @@ Button::Button( QGraphicsItem *parent, QSharedPointer<MToolbarItem> item ) : MBu
     //if (!this->item->text().isEmpty()) {
         //setText(this->item->text());
     //}
+    this->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ) ;
+    //qDebug() << "size" ;
+    //qDebug() << this->preferredSize().width() ;
+    //qDebug() << this->preferredSize().height() ;
 }
 
 Button::~Button() {
