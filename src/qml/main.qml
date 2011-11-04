@@ -34,6 +34,13 @@ Rectangle {
                 font.pointSize: 16
                 color : "white"
             }
+            ToolbarIcon {
+                iconId : "icon-m-conversation-attachment"
+                x : 0
+                y : 0
+                height : 100
+                width : 100
+            }
         }
     }
 

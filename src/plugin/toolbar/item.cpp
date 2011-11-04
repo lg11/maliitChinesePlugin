@@ -8,9 +8,11 @@ class ItemPrivate {
 public :
     MToolbarItem* item ;
     QString text ;
+    Qt::Alignment alignment ;
     ItemPrivate() : \
         item( 0 ), \
-        text() \
+        text(), \
+        alignment( Qt::AlignCenter )
     {
     }
     ~ItemPrivate() {}
@@ -23,14 +25,30 @@ Item::~Item() {
     delete this->d_ptr ;
 }
 
-const QString& Item::getText() {
+const QString& Item::getText() const {
     Q_D( const Item ) ;
     return d->text ;
 }
 
 void Item::setText( const QString& text ) {
     Q_D( Item ) ;
-    d->text = text ;
+    if ( d->text != text ) {
+        d->text = text ;
+        emit this->textChanged( d->text ) ;
+    }
+}
+
+Qt::Alignment Item::getAlignment() const {
+    Q_D( const Item ) ;
+    return d->alignment ;
+}
+
+void Item::setAlignment( Qt::Alignment alignment ) {
+    Q_D( Item ) ;
+    if ( d->alignment != alignment ) {
+        d->alignment = alignment ;
+        emit this->alignmentChanged( d->alignment ) ;
+    }
 }
 
 } 
