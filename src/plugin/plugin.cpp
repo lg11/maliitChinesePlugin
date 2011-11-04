@@ -1,5 +1,9 @@
+#include <qdeclarative.h>
+
 #include "plugin.h"
 #include "inputmethod.h"
+#include "toolbar/data.h"
+#include "toolbar/item.h"
 #include "settings.h"
 
 namespace plugin {
@@ -24,7 +28,9 @@ public :
 } ;
 
 Plugin::Plugin() : d_ptr( new PluginPrivate ) {
-    //qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.inputmethod", 1, 0, "InputMethod", "inputmethod" ) ;
+    qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.inputmethod", 1, 0, "InputMethod", "inputmethod" ) ;
+    qmlRegisterUncreatableType<toolbar::Data> ( "me.inputmethod.toolbar", 1, 0, "ToolbarData", "toolbardata" ) ;
+    qmlRegisterUncreatableType<toolbar::Item> ( "me.inputmethod.toolbar", 1, 0, "ToolbarItem", "toolbaritem" ) ;
 }
 
 Plugin::~Plugin() {

@@ -14,16 +14,16 @@ TARGET = cuteinputmethod
 OBJECTS_DIR = .tmp
 MOC_DIR = .tmp
 
-INCLUDEPATH += ./inputmethod ./settings ./toolbar
+INCLUDEPATH += ./inputmethod ./settings
 
 HEADERS += \
 	plugin.h \
 	./inputmethod/inputmethod.h \
 	./settings/settings.h ./settings/widget.h \
-	./toolbar/toolbar.h ./toolbar/button.h ./toolbar/item.h
+	./toolbar/data.h ./toolbar/item.h
 	
 SOURCES += \
 	plugin.cpp \
 	./inputmethod/inputmethod.cpp \
 	./settings/settings.cpp \
-	./toolbar/toolbar.cpp ./toolbar/button.cpp ./toolbar/item.cpp
+	./toolbar/data.cpp ./toolbar/item.cpp

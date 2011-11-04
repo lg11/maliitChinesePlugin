@@ -1,5 +1,5 @@
 #include "inputmethod.h"
-#include "toolbar.h"
+#include "toolbar/data.h"
 
 #include <QGraphicsView>
 #include <QGraphicsObject>
@@ -46,7 +46,7 @@ public :
     int appOrientation ;
     QRect cursorRect ;
     QString debugString ;
-    toolbar::Toolbar* toolbar ;
+    toolbar::Data* toolbarData ;
     
     InputMethodPrivate( InputMethod* inputmethod, QWidget* mainWindow ) :
         q_ptr( inputmethod ) ,
@@ -58,7 +58,7 @@ public :
         appOrientation( 0 ) ,
         cursorRect() ,
         debugString() ,
-        toolbar( new toolbar::Toolbar() )
+        toolbarData( new toolbar::Data() )
     {
         //ok = connect(imToolbar, SIGNAL(copyPasteRequest(CopyPasteState)),
                      //this, SLOT(sendCopyPaste(CopyPasteState)));
@@ -76,8 +76,8 @@ public :
                      //this, SLOT(userHide()));
         //Q_ASSERT(ok);
 
-        this->scene->addItem( this->toolbar ) ;
         this->engine->rootContext()->setContextProperty( "inputmethod", inputmethod ) ;
+        this->engine->rootContext()->setContextProperty( "toolbarData", this->toolbarData ) ;
     }
 
     ~InputMethodPrivate() {
@@ -87,19 +87,17 @@ public :
             delete this->component ;
         delete this->engine ;
         delete this->view ;
-        delete this->toolbar ;
+        delete this->toolbarData ;
     }
 
     void show() {
         if ( this->content )
             this->content->show() ;
-        this->toolbar->show() ;
     }
 
     void hide() {
         if ( this->content )
             this->content->hide() ;
-        this->toolbar->hide() ;
     }
 
     void load( const QString& path ) {
@@ -203,25 +201,16 @@ void InputMethod::handleAppOrientationChanged( int angle) {
     
     if ( d->appOrientation != angle ) {
         d->appOrientation = angle ;
-        d->toolbar->setRotation( angle ) ;
+        d->toolbarData->setOrientation( angle ) ;
         emit this->appOrientationChanged( d->appOrientation ) ;
     }
 }
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
     Q_D( InputMethod ) ;
-    if ( !toolbar ) 
-        return ;
-    if ( d->appOrientation == 0 )
-        d->toolbar->set( toolbar, M::Landscape ) ;
-    else if ( d->appOrientation == 270 ) 
-        d->toolbar->set( toolbar, M::Portrait ) ;
-    
-    d->debugString.clear() ;
-    QTextStream stream( &(d->debugString) ) ;
-    QRectF rect( d->toolbar->rect() ) ;
-    stream << rect.x() << "," << rect.y() << "," << rect.width() << "," << rect.height() ;
-    emit this->debugStringChanged( d->debugString ) ;
+    if ( toolbar ) {
+        d->toolbarData->set( toolbar ) ;
+    }
 }
 
 void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count, quint32 nativeScanCode, quint32 nativeModifiers, unsigned long time) {
@@ -324,20 +313,7 @@ void InputMethod::setInputMethodArea( const QRect &area ) {
     Q_D( InputMethod ) ;
     if ( d->inputMethodArea != area ) {
         d->inputMethodArea = area ;
-        QRect rect( area ) ;
-
-        if ( d->appOrientation == 0 ) {
-            rect.setRect( rect.x(), rect.y() - d->toolbar->rect().height(), rect.width(), rect.height() + d->toolbar->rect().height() ) ;
-            d->toolbar->setWidth( this->screenWidth() ) ;
-            d->toolbar->setPos( rect.topLeft() ) ;
-        }
-        else {
-            rect.setRect( rect.x() - d->toolbar->rect().height(), rect.y(), rect.width() + d->toolbar->rect().height(), rect.height() ) ;
-            d->toolbar->setWidth( this->screenHeight() ) ;
-            d->toolbar->setPos( rect.bottomLeft() ) ;
-        }
-    
-        QRegion region( rect ) ;
+        QRegion region( area ) ;
         this->inputMethodHost()->setInputMethodArea( region ) ;
     }
 }

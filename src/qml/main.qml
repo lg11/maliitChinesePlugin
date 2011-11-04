@@ -1,4 +1,5 @@
 import Qt 4.7
+import me.inputmethod.toolbar 1.0
 
 Rectangle {
     id : canvas
