@@ -11,19 +11,28 @@ class IconPrivate {
 public :
     const QPixmap* pixmap ;
     QString iconId ;
+    QString iconPath ;
     const MStyle* style ;
     IconPrivate() : \
         pixmap( 0 ), \
-        iconId()
+        iconId(), \
+        iconPath()
     {
         this->style = MTheme::style( "MButtonStyle", QString(""), QString("active"), QString("default"), M::Landscape ) ;
     }
-    ~IconPrivate() {
-        if ( !this->iconId.isEmpty() )
+    void releasePixmap() {
+        if ( !this->iconId.isEmpty() ) {
+            this->iconId.clear() ;
             MTheme::releasePixmap( this->pixmap ) ;
+        }
+        else if ( !this->iconPath.isEmpty() ) {
+            this->iconPath.clear() ;
+            delete this->pixmap ;
+        }
+    }
+    ~IconPrivate() {
+        this->releasePixmap() ;
         MTheme::releaseStyle( this->style ) ;
-        //else if ( this->pixmap )
-            //delete this->pixmap ;
     }
 } ;
 
@@ -38,7 +47,7 @@ Icon::~Icon() {
     delete this->d_ptr ;
 }
 
-const QString& Icon::getIconId() {
+const QString& Icon::getIconId() const {
     Q_D( const Icon ) ;
     return d->iconId ;
 }
@@ -46,11 +55,24 @@ const QString& Icon::getIconId() {
 void Icon::setIconId( const QString& iconId ) {
     Q_D( Icon ) ;
     if ( d->iconId != iconId ) {
+        d->releasePixmap() ;
         d->iconId = iconId ;
-        if ( d->pixmap )
-            MTheme::releasePixmap( d->pixmap ) ;
         const MButtonStyle* style = static_cast<const MButtonStyle*>(d->style) ;
         d->pixmap = MTheme::pixmap( iconId, style->iconSize() ) ;
+    }
+}
+
+const QString& Icon::getIconPath() const {
+    Q_D( const Icon ) ;
+    return d->iconPath ;
+}
+
+void Icon::setIconPath( const QString& iconPath ) {
+    Q_D( Icon ) ;
+    if ( d->iconPath != iconPath ) {
+        d->releasePixmap() ;
+        d->iconPath = iconPath ;
+        d->pixmap = new QPixmap( iconPath ) ;
     }
 }
 
@@ -58,7 +80,7 @@ void Icon::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     Q_D( const Icon ) ;
     Q_UNUSED( option )
     Q_UNUSED( widget )
-    qDebug() << "icon_paint" ;
+    //qDebug() << "icon_paint" ;
     if ( d->pixmap ) 
         painter->drawPixmap( this->boundingRect(), *(d->pixmap), QRectF(d->pixmap->rect()) ) ;
         //painter->drawPixmap( this->boundingRect(), *(d->pixmap), QRectF(d->pixmap->rect()) ) ;

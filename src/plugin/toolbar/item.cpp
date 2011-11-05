@@ -8,10 +8,14 @@ class ItemPrivate {
 public :
     MToolbarItem* item ;
     QString text ;
+    QString iconId ;
+    QString iconPath ;
     Qt::Alignment alignment ;
     ItemPrivate() : \
         item( 0 ), \
         text(), \
+        iconId(), \
+        iconPath(), \
         alignment( Qt::AlignCenter )
     {
     }
@@ -35,6 +39,40 @@ void Item::setText( const QString& text ) {
     if ( d->text != text ) {
         d->text = text ;
         emit this->textChanged( d->text ) ;
+    }
+}
+
+const QString& Item::getIconId() const {
+    Q_D( const Item ) ;
+    return d->iconId ;
+}
+
+void Item::setIconId( const QString& iconId ) {
+    Q_D( Item ) ;
+    if ( d->iconId != iconId ) {
+        if ( !d->iconPath.isEmpty() ) {
+            d->iconPath.clear() ;
+            emit this->iconPathChanged( QString("") ) ;
+        }
+        d->iconId = iconId ;
+        emit this->iconIdChanged( d->iconId ) ;
+    }
+}
+
+const QString& Item::getIconPath() const {
+    Q_D( const Item ) ;
+    return d->iconPath ;
+}
+
+void Item::setIconPath( const QString& iconPath ) {
+    Q_D( Item ) ;
+    if ( d->iconPath != iconPath ) {
+        if ( !d->iconId.isEmpty() ) {
+            d->iconId.clear() ;
+            emit this->iconIdChanged( QString("") ) ;
+        }
+        d->iconPath = iconPath ;
+        emit this->iconPathChanged( d->iconPath ) ;
     }
 }
 

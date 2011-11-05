@@ -1,4 +1,5 @@
 import Qt 4.7
+import me.inputmethod 1.0
 import me.inputmethod.toolbar 1.0
 
 Rectangle {
@@ -34,13 +35,6 @@ Rectangle {
                 font.pointSize: 16
                 color : "white"
             }
-            ToolbarIcon {
-                iconId : "icon-m-conversation-attachment"
-                x : 0
-                y : 0
-                height : 100
-                width : 100
-            }
         }
     }
 
@@ -63,6 +57,13 @@ Rectangle {
             var pos = root.mapToItem( canvas, panel.x + panel.width, panel.y )
             /*display.text = "270\n" + pos.x + "," + pos.y + "," + panel.height + "," + panel.width + "\n" + inputmethod.debugString*/
             inputmethod.setInputMethodArea( Qt.rect( pos.x, pos.y, panel.height, panel.width ) )
+        }
+
+        var l = toolbarData.items.length
+        for ( var i = 0 ; i < l ; i++ ) {
+            console.log( "toolbar item text :", toolbarData.items[i].text )
+            console.log( "toolbar item iconId :", toolbarData.items[i].iconId )
+            console.log( "toolbar item iconPath :", toolbarData.items[i].iconPath )
         }
     }
 

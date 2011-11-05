@@ -10,10 +10,14 @@ class ItemPrivate ;
 class Item : public QObject {
     Q_OBJECT
     Q_PROPERTY( QString text READ getText WRITE setText NOTIFY textChanged )
+    Q_PROPERTY( QString iconId READ getIconId WRITE setIconId NOTIFY iconIdChanged )
+    Q_PROPERTY( QString iconPath READ getIconPath WRITE setIconPath NOTIFY iconPathChanged )
     Q_PROPERTY( Qt::Alignment alignment READ getAlignment WRITE setAlignment NOTIFY alignmentChanged )
 
 signals :
     void textChanged( const QString& text ) ;
+    void iconIdChanged( const QString& iconId ) ;
+    void iconPathChanged( const QString& iconPath ) ;
     void alignmentChanged( Qt::Alignment ) ;
 
 public :
@@ -22,6 +26,10 @@ public :
 
     const QString& getText() const ;
     void setText( const QString& text ) ;
+    const QString& getIconId() const ;
+    void setIconId( const QString& iconId ) ;
+    const QString& getIconPath() const ;
+    void setIconPath( const QString& iconPath ) ;
     Qt::Alignment getAlignment() const ;
     void setAlignment( Qt::Alignment alignment ) ;
 
