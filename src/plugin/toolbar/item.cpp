@@ -10,12 +10,14 @@ public :
     QString text ;
     QString iconId ;
     QString iconPath ;
+    int size ;
     Qt::Alignment alignment ;
     ItemPrivate() : \
         item( 0 ), \
         text(), \
         iconId(), \
         iconPath(), \
+        size( 0 ),
         alignment( Qt::AlignCenter )
     {
     }
@@ -73,6 +75,19 @@ void Item::setIconPath( const QString& iconPath ) {
         }
         d->iconPath = iconPath ;
         emit this->iconPathChanged( d->iconPath ) ;
+    }
+}
+
+int Item::getSize() const {
+    Q_D( const Item ) ;
+    return d->size ;
+}
+
+void Item::setSize( int size ) {
+    Q_D( Item ) ;
+    if ( d->size != size ) {
+        d->size = size ;
+        emit this->sizeChanged( d->size ) ;
     }
 }
 

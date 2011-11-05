@@ -1,6 +1,7 @@
 import Qt 4.7
 import me.inputmethod 1.0
 import me.inputmethod.toolbar 1.0
+import me.utils.toucharea 1.0
 
 Rectangle {
     id : canvas
@@ -22,11 +23,12 @@ Rectangle {
             width : parent.width
             height : parent.height / 3
             color : "#FF00FF00"
-            Rectangle {
+            Button {
+                id : testButton
                 anchors.centerIn : parent
                 width : parent.width / 2
                 height : parent.height / 2
-                color : "#FFFF0000"
+                /*color : "#FFFF0000"*/
             }
             Text {
                 id : display
@@ -36,10 +38,21 @@ Rectangle {
                 color : "white"
             }
         }
+        RootTouchArea {
+            anchors.fill : parent
+            FakeTouchArea {
+                id : testInput
+                anchors.fill : parent
+            }
+        }
     }
+
+
 
     Component.onCompleted : {
         inputmethod.setInputMethodArea( Qt.rect( panel.x, panel.y, panel.width, panel.height ) )
+        testInput.entered.connect( testButton.handleEntered ) 
+        testInput.exited.connect( testButton.handleExited ) 
     }
 
     function handleAppOrientationChanged( angle ) {
@@ -64,6 +77,7 @@ Rectangle {
             console.log( "toolbar item text :", toolbarData.items[i].text )
             console.log( "toolbar item iconId :", toolbarData.items[i].iconId )
             console.log( "toolbar item iconPath :", toolbarData.items[i].iconPath )
+            console.log( "toolbar item size :", toolbarData.items[i].size )
         }
     }
 

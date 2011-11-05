@@ -85,24 +85,20 @@ inline Item* create_item( QSharedPointer<MToolbarItem> item ) {
     else
         new_item->setAlignment( Qt::AlignVCenter ) ;
 
-    if ( !item->name().isEmpty() ) {
+    if ( !item->name().isEmpty() )
         new_item->setObjectName( item->name() );
-    }
 
-    if ( !item->iconId().isEmpty() ) {
-        //qDebug() << "iconId : " << item->iconId() ;
+    if ( !item->iconId().isEmpty() ) 
         new_item->setIconId( item->iconId() ) ;
-    } else {
-        //qDebug() << "iconPath : " << item->icon() ;
+    else 
         new_item->setIconPath( item->icon() ) ;
-    }
 
-    //if (!item->textId().isEmpty()) {
-        //setText(qtTrId(itemPtr->textId().toUtf8().data()));
-    //}
-    //if (!itemPtr->text().isEmpty()) {
-        //setText(itemPtr->text());
-    //}
+    if ( !item->textId().isEmpty() ) 
+        new_item->setText( qtTrId(item->textId().toUtf8().data()) ) ;
+    else if ( !item->text().isEmpty() ) 
+        new_item->setText( item->text() ) ;
+
+    new_item->setSize( item->size() ) ;
 
     /*
     updateItemVisibility(item);
