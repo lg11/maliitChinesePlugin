@@ -5,6 +5,7 @@ Item {
     property TouchArea input : null
     property bool pressed : false
     property int padding : 0
+    property alias color : plat.color
 
     Rectangle {
         id : plat

@@ -3,7 +3,6 @@
 #include <QPixmap>
 
 #include <MTheme>
-#include <mbuttonstyle.h>
 
 namespace toolbar {
 
@@ -12,13 +11,11 @@ public :
     const QPixmap* pixmap ;
     QString iconId ;
     QString iconPath ;
-    const MStyle* style ;
     IconPrivate() : \
         pixmap( 0 ), \
         iconId(), \
         iconPath()
     {
-        this->style = MTheme::style( "MButtonStyle", QString(""), QString("active"), QString("default"), M::Landscape ) ;
     }
     void releasePixmap() {
         if ( !this->iconId.isEmpty() ) {
@@ -32,7 +29,6 @@ public :
     }
     ~IconPrivate() {
         this->releasePixmap() ;
-        MTheme::releaseStyle( this->style ) ;
     }
 } ;
 
@@ -57,8 +53,7 @@ void Icon::setIconId( const QString& iconId ) {
     if ( d->iconId != iconId ) {
         d->releasePixmap() ;
         d->iconId = iconId ;
-        const MButtonStyle* style = static_cast<const MButtonStyle*>(d->style) ;
-        d->pixmap = MTheme::pixmap( iconId, style->iconSize() ) ;
+        d->pixmap = MTheme::pixmap( iconId, QSize( 32, 32 ) ) ;
     }
 }
 

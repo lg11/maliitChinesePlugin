@@ -1,5 +1,4 @@
 #include "inputmethod.h"
-#include "toolbar/data.h"
 
 #include <QGraphicsView>
 #include <QGraphicsObject>
@@ -45,8 +44,8 @@ public :
     QRect inputMethodArea ;
     int appOrientation ;
     QRect cursorRect ;
-    QString debugString ;
     toolbar::Data* toolbarData ;
+    QString debugString ;
     
     InputMethodPrivate( InputMethod* inputmethod, QWidget* mainWindow ) :
         q_ptr( inputmethod ) ,
@@ -57,8 +56,8 @@ public :
         component( NULL ) ,
         appOrientation( 0 ) ,
         cursorRect() ,
-        debugString() ,
-        toolbarData( new toolbar::Data() )
+        toolbarData( new toolbar::Data() ) ,
+        debugString()
     {
         //ok = connect(imToolbar, SIGNAL(copyPasteRequest(CopyPasteState)),
                      //this, SLOT(sendCopyPaste(CopyPasteState)));
@@ -281,25 +280,25 @@ bool InputMethod::imExtensionEvent( MImExtensionEvent *event) {
     return false ;
 }
 
-int InputMethod::screenWidth() {
+int InputMethod::screenWidth() const {
     return display_rect().width() ;
 }
 
-int InputMethod::screenHeight() {
+int InputMethod::screenHeight() const {
     return display_rect().height() ;
 }
 
-int InputMethod::appOrientation() {
-    Q_D( InputMethod ) ;
+int InputMethod::appOrientation() const {
+    Q_D( const InputMethod ) ;
     return d->appOrientation ;
 }
 
-const QRect& InputMethod::cursorRect() {
+const QRect& InputMethod::cursorRect() const {
     Q_D( const InputMethod ) ;
     return d->cursorRect ;
 }
 
-const QString& InputMethod::debugString() {
+const QString& InputMethod::debugString() const {
     Q_D( const InputMethod ) ;
     return d->debugString ;
 }

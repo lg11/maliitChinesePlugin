@@ -1,6 +1,8 @@
 #ifndef INPUTMETHOD_H
 #define INPUTMETHOD_H
 
+#include "toolbar/data.h"
+
 #include <mabstractinputmethod.h>
 
 #include <QRect>
@@ -51,11 +53,11 @@ public :
     virtual void setKeyOverrides( const QMap<QString, QSharedPointer<MKeyOverride> > &overrides ) ;
     virtual bool imExtensionEvent( MImExtensionEvent *event) ;
 
-    int screenWidth() ;
-    int screenHeight() ;
-    int appOrientation() ;
-    const QRect& cursorRect() ;
-    const QString& debugString() ;
+    int screenWidth() const ;
+    int screenHeight() const ;
+    int appOrientation() const ;
+    const QRect& cursorRect() const ;
+    const QString& debugString() const ;
 
 public slots:
     void setScreenRegion( const QRect &area ) ;
