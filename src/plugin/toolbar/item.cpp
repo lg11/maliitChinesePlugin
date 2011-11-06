@@ -98,6 +98,7 @@ Qt::Alignment Item::getAlignment() const {
 
 void Item::setAlignment( Qt::Alignment alignment ) {
     Q_D( Item ) ;
+    alignment = alignment & ( Qt::AlignLeft | Qt::AlignRight ) ;
     if ( d->alignment != alignment ) {
         d->alignment = alignment ;
         emit this->alignmentChanged( d->alignment ) ;

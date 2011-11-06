@@ -27,7 +27,6 @@ Item {
     Row {
         id : centerRow
         spacing : 4
-        anchors.verticalCenter : parent.verticalCenter
         anchors.centerIn : parent
     }
     Row {
@@ -39,9 +38,20 @@ Item {
     }
 
     function clear() {
-        var l = leftRow.children.length
+        var l
+        l = leftRow.children.length
         for ( var i = 0 ; i < l ; i++ ) {
             var obj = leftRow.children[i]
+            obj.destroy( 1 )
+        }
+        l = centerRow.children.length
+        for ( var i = 0 ; i < l ; i++ ) {
+            var obj = centerRow.children[i]
+            obj.destroy( 1 )
+        }
+        l = rightRow.children.length
+        for ( var i = 0 ; i < l ; i++ ) {
+            var obj = rightRow.children[i]
             obj.destroy( 1 )
         }
     }
@@ -50,8 +60,20 @@ Item {
         var l = toolbarData.items.length
         for ( var i = 0 ; i < l ; i++ ) {
             var item = toolbarData.items[i]
-            /*if item*/
-            var button = buttonComponent.createObject( leftRow, {} )
+            var button
+            console.log( "out", item.alignment, Qt.AlignLeft, Qt.AlignRight )
+            if ( item.alignment == Qt.AlignLeft ) {
+                console.log( "left" )
+                button = buttonComponent.createObject( leftRow, {} )
+            }
+            else if ( item.alignment == Qt.AlignRight ) {
+                console.log( "right" )
+                button = buttonComponent.createObject( rightRow, {} )
+            }
+            else {
+                console.log( "center" )
+                button = buttonComponent.createObject( centerRow, {} )
+            }
         }
         console.log( "toobar update", leftRow.children.length )
     }
