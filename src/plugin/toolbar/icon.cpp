@@ -11,20 +11,27 @@ public :
     const QPixmap* pixmap ;
     QString iconId ;
     QString iconPath ;
-    IconPrivate() : \
-        pixmap( 0 ), \
-        iconId(), \
-        iconPath()
+    qreal paintedWidth ;
+    qreal paintedHeight ;
+    IconPrivate() :
+        pixmap( 0 ) ,
+        iconId() ,
+        iconPath() ,
+        paintedWidth( 0 ) ,
+        paintedHeight( 0 ) 
     {
     }
     void releasePixmap() {
-        if ( !this->iconId.isEmpty() ) {
-            this->iconId.clear() ;
-            MTheme::releasePixmap( this->pixmap ) ;
-        }
-        else if ( !this->iconPath.isEmpty() ) {
-            this->iconPath.clear() ;
-            delete this->pixmap ;
+        if ( this->pixmap ) {
+            if ( !this->iconId.isEmpty() ) {
+                this->iconId.clear() ;
+                MTheme::releasePixmap( this->pixmap ) ;
+            }
+            else if ( !this->iconPath.isEmpty() ) {
+                this->iconPath.clear() ;
+                delete this->pixmap ;
+            }
+            this->pixmap = 0 ;
         }
     }
     ~IconPrivate() {
@@ -43,6 +50,24 @@ Icon::~Icon() {
     delete this->d_ptr ;
 }
 
+void Icon::checkPaintedSize() {
+    Q_D( Icon ) ;
+    qreal paintedWidth = 0 ;
+    qreal paintedHeight = 0 ;
+    if ( d->pixmap ) {
+        paintedWidth = d->pixmap->width() ;
+        paintedHeight = d->pixmap->height() ;
+    }
+    if ( d->paintedWidth != paintedWidth ) {
+        d->paintedWidth = paintedWidth ;
+        emit this->paintedWidthChanged( d->paintedWidth ) ;
+    }
+    if ( d->paintedHeight != paintedHeight ) {
+        d->paintedHeight = paintedHeight ;
+        emit this->paintedHeightChanged( d->paintedHeight ) ;
+    }
+}
+
 const QString& Icon::getIconId() const {
     Q_D( const Icon ) ;
     return d->iconId ;
@@ -53,7 +78,10 @@ void Icon::setIconId( const QString& iconId ) {
     if ( d->iconId != iconId ) {
         d->releasePixmap() ;
         d->iconId = iconId ;
-        d->pixmap = MTheme::pixmap( iconId, QSize( 32, 32 ) ) ;
+        if ( !d->iconId.isEmpty() ) {
+            d->pixmap = MTheme::pixmap( iconId, QSize( 32, 32 ) ) ;
+        }
+        this->checkPaintedSize() ;
     }
 }
 
@@ -67,9 +95,23 @@ void Icon::setIconPath( const QString& iconPath ) {
     if ( d->iconPath != iconPath ) {
         d->releasePixmap() ;
         d->iconPath = iconPath ;
-        d->pixmap = new QPixmap( iconPath ) ;
+        if ( !d->iconPath.isEmpty() ) {
+            d->pixmap = new QPixmap( iconPath ) ;
+        }
+        this->checkPaintedSize() ;
     }
 }
+
+qreal Icon::getPaintedWidth() const {
+    Q_D( const Icon ) ;
+    return d->paintedWidth ;
+}
+
+qreal Icon::getPaintedHeight() const {
+    Q_D( const Icon ) ;
+    return d->paintedHeight ;
+}
+
 
 void Icon::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget ) {
     Q_D( const Icon ) ;

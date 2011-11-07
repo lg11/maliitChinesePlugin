@@ -8,9 +8,7 @@ Item {
 
     Component {
         id : buttonComponent
-        Button {
-            height : 48
-            width : 48
+        ToolbarButton {
         }
     }
     Rectangle {
@@ -23,6 +21,7 @@ Item {
         spacing : 4
         anchors.verticalCenter : parent.verticalCenter
         anchors.left : parent.left
+        anchors.leftMargin : 4
     }
     Row {
         id : centerRow
@@ -34,7 +33,8 @@ Item {
         spacing : 4
         anchors.verticalCenter : parent.verticalCenter
         anchors.right : parent.right
-        layoutDirection : Qt.RightToLeft
+        /*layoutDirection : Qt.RightToLeft*/
+        anchors.rightMargin : 4
     }
 
     function clear() {
@@ -55,24 +55,37 @@ Item {
             obj.destroy( 1 )
         }
     }
+
+    function setButton( button, item ) {
+        console.log( "set id" )
+        button.iconId = item.iconId
+        console.log( "set path" )
+        button.iconPath = item.iconPath
+        console.log( "set text" )
+        button.text = item.text
+        button.sizePercent = item.size / 100.00
+        console.log( "set done", button.height, button.width, button.iconId, button.iconPath )
+    }
     function update() {
         clear()
         var l = toolbarData.items.length
         for ( var i = 0 ; i < l ; i++ ) {
             var item = toolbarData.items[i]
             var button
-            console.log( "out", item.alignment, Qt.AlignLeft, Qt.AlignRight )
             if ( item.alignment == Qt.AlignLeft ) {
                 console.log( "left" )
                 button = buttonComponent.createObject( leftRow, {} )
+                setButton( button, item )
             }
             else if ( item.alignment == Qt.AlignRight ) {
                 console.log( "right" )
                 button = buttonComponent.createObject( rightRow, {} )
+                setButton( button, item )
             }
             else {
                 console.log( "center" )
                 button = buttonComponent.createObject( centerRow, {} )
+                setButton( button, item )
             }
         }
         console.log( "toobar update", leftRow.children.length )
