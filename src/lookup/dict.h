@@ -47,13 +47,13 @@ public :
     qreal highestFreq ;
     inline Dictionary() : hash() { this->highestFreq = -0x1000 ; }
     inline WordRecordList* get( const QString& key ) { return this->hash.contains(key) ? &(this->hash[key]) : NULL ; }
-    inline void insert( const QString& key, const QString& word, qreal freq ) { 
-        this->highestFreq = freq > this->highestFreq ? freq : highestFreq ;
-        insert_record( &(this->hash[key]), word, freq ) ;
-    }
-    inline qreal update( const QString& key, const QString& word, qreal freq ) {
+    //inline void insert( const QString& key, const QString& word, qreal freq ) { 
+        //this->highestFreq = freq > this->highestFreq ? freq : highestFreq ;
+        //insert_record( &(this->hash[key]), word, freq ) ;
+    //}
+    inline void insert( const QString& key, const QString& word, qreal freq ) {
         if ( freq >= 0 ) 
-            this->insert( key, word, freq ) ;
+            insert_record( &(this->hash[key]), word, freq ) ;
         else {
             WordRecordList* list = &(this->hash[key]) ; 
             if ( list->isEmpty() ) {
@@ -79,7 +79,7 @@ public :
         }
         this->highestFreq = freq > this->highestFreq ? freq : highestFreq ;
         //qDebug() << key << word << freq << highestFreq ;
-        return freq ;
+        //return freq ;
     }
 } ;
 

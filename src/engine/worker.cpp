@@ -1,6 +1,6 @@
-#include "engine.h"
-#include "../lookup/lookup.h"
-#include "../lookup/t9.h"
+#include "worker.h"
+#include "lookup/lookup.h"
+#include "lookup/t9.h"
 
 #include <QStringList>
 #include <QSet>
@@ -50,8 +50,7 @@ inline void pop_selected( SelectedPair* pair, QString* code ) {
     }
 }
 
-Engine::Engine( QObject* parent ) : 
-    QObject( parent ),
+Worker::Worker() : 
     lookup( new lookup::Lookup() ),
     t9lookup( new t9::T9Lookup( &(this->lookup->dict) ) ),
     selected(),
@@ -59,60 +58,54 @@ Engine::Engine( QObject* parent ) :
     this->pageStartIndex = 0 ;
     this->candidate = NULL ;
     this->keyboardLayout = UnknownKeyboardLayout ;
-    this->logFile = NULL ;
-    this->textStream = NULL ;
+    //this->logFile = NULL ;
+    //this->textStream = NULL ;
 
-    this->flushTimer.setInterval( 1200000 ) ;
-    QObject::connect( &(this->flushTimer), SIGNAL(timeout()), this, SLOT(flushLog() ) ) ;
+    //this->flushTimer.setInterval( 1200000 ) ;
+    //QObject::connect( &(this->flushTimer), SIGNAL(timeout()), this, SLOT(flushLog() ) ) ;
 }
 
-Engine::~Engine() {
-    if ( this->logFile ) {
-        delete this->textStream ;
-        this->logFile->close() ;
-        delete this->logFile ;
-    }
-}
-
-void Engine::startLog( const QString& path ) {
-    this->logFile = new QFile( path ) ;
-    if ( this->logFile->exists() ) {
-        this->logFile->open( QIODevice::WriteOnly | QIODevice::Append ) ;
-        //this->logFile->open( QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered ) ;
-        this->textStream = new QTextStream( this->logFile ) ;
-        this->textStream->setCodec( "utf-8" ) ;
-        this->textStream->setRealNumberNotation( QTextStream::SmartNotation ) ;
-        this->textStream->setRealNumberPrecision( 16 ) ;
-        this->flushTimer.start() ;
-    }
-    else {
-        delete this->logFile ;
-        this->logFile = NULL ;
-    }
-}
-
-void Engine::stopLog() {
-    if ( this->logFile ) {
-        delete this->textStream ;
-        this->logFile->close() ;
-        delete this->logFile ;
-        this->logFile = NULL ;
-        this->textStream = NULL ;
-        this->flushTimer.stop() ;
-    }
-}
-
-void Engine::flushLog() {
-    //qDebug() << "flush" ;
-    if ( this->logFile ) {
-        this->logFile->flush() ;
+Worker::~Worker() {
+    //if ( this->logFile ) {
+        //delete this->textStream ;
         //this->logFile->close() ;
-        //this->logFile->open( QIODevice::WriteOnly | QIODevice::Append ) ;
-        //fsync( this->logFile->handle() ) ;
-    }
+        //delete this->logFile ;
+    //}
 }
 
-void Engine::load( const QString& path ) {
+//void Worker::startLog( const QString& path ) {
+    //this->logFile = new QFile( path ) ;
+    //if ( this->logFile->exists() ) {
+        //this->logFile->open( QIODevice::WriteOnly | QIODevice::Append ) ;
+        //this->textStream = new QTextStream( this->logFile ) ;
+        //this->textStream->setCodec( "utf-8" ) ;
+        //this->textStream->setRealNumberNotation( QTextStream::SmartNotation ) ;
+        //this->textStream->setRealNumberPrecision( 16 ) ;
+        //this->flushTimer.start() ;
+    //}
+    //else {
+        //delete this->logFile ;
+        //this->logFile = NULL ;
+    //}
+//}
+
+//void Worker::stopLog() {
+    //if ( this->logFile ) {
+        //delete this->textStream ;
+        //this->logFile->close() ;
+        //delete this->logFile ;
+        //this->logFile = NULL ;
+        //this->textStream = NULL ;
+        //this->flushTimer.stop() ;
+    //}
+//}
+
+//void Worker::flushLog() {
+    //if ( this->logFile ) 
+        //this->logFile->flush() ;
+//}
+
+void Worker::load( const QString& path ) {
     QFile file( path ) ;
     if ( file.open( QIODevice::ReadOnly | QIODevice::Text ) ) {
         QSet<QString> newKeySet ;
@@ -140,7 +133,7 @@ void Engine::load( const QString& path ) {
     }
 }
 
-bool Engine::prevPage( int pageLength ) {
+bool Worker::prevPage( int pageLength ) {
     bool flag = false ;
     if ( this->pageStartIndex >= pageLength ) {
         this->pageStartIndex -= pageLength ;
@@ -151,14 +144,14 @@ bool Engine::prevPage( int pageLength ) {
     return flag ;
 }
 
-bool Engine::nextPage( int pageLength ) {
+bool Worker::nextPage( int pageLength ) {
     bool flag = false ;
     int pageStartIndex = this->pageStartIndex + pageLength ;
     const lookup::Candidate* candidate ;
     if ( this->keyboardLayout == FullKeyboardLayout )
-        candidate = this->lookup->getCand( pageStartIndex ) ;
+        candidate = this->lookup->getCandidate( pageStartIndex ) ;
     else if ( this->keyboardLayout == T9KeyboardLayout )
-        candidate = this->t9lookup->getCand( pageStartIndex ) ;
+        candidate = this->t9lookup->getCandidate( pageStartIndex ) ;
     else
         candidate = NULL ;
     if ( candidate ) {
@@ -168,7 +161,7 @@ bool Engine::nextPage( int pageLength ) {
     return flag ;
 }
 
-int Engine::getCodeLength() const {
+int Worker::getCodeLength() const {
     if ( this->keyboardLayout == FullKeyboardLayout )
         return this->lookup->spliter.code.length() ;
     else if ( this->keyboardLayout == T9KeyboardLayout )
@@ -177,7 +170,7 @@ int Engine::getCodeLength() const {
         return 0 ;
 }
 
-int Engine::getPreeditCodeLength() const {
+int Worker::getPreeditCodeLength() const {
     if ( this->candidate ) {
         const QString* preedit = lookup::get_preedit( this->candidate ) ;
         return preedit->length() - preedit->count( '\'' ) ;
@@ -185,24 +178,22 @@ int Engine::getPreeditCodeLength() const {
     return 0 ;
 }
 
-int Engine::getInvalidCodeLength() const { return this->getCodeLength() - this->getPreeditCodeLength() ; }
+int Worker::getInvalidCodeLength() const { return this->getCodeLength() - this->getPreeditCodeLength() ; }
 
-//int Engine::getSelectedLength() const { return this->selectedWord->length() ; }
+int Worker::getSelectedWordLength() const { return this->selectedWord->length() ; }
 
-int Engine::getSelectedWordLength() const { return this->selectedWord->length() ; }
-
-bool Engine::updateCandidate( int index ) {
+bool Worker::updateCandidate( int index ) {
     if ( this->keyboardLayout == FullKeyboardLayout ) {
         if ( this->lookup->spliter.code.isEmpty() )
             this->candidate = NULL ;
         else 
-            this->candidate = this->lookup->getCand( pageStartIndex + index ) ;
+            this->candidate = this->lookup->getCandidate( pageStartIndex + index ) ;
     }
     else if ( this->keyboardLayout == T9KeyboardLayout ) {
         if ( this->t9lookup->code.isEmpty() )
             this->candidate = NULL ;
         else 
-            this->candidate = this->t9lookup->getCand( pageStartIndex + index ) ;
+            this->candidate = this->t9lookup->getCandidate( pageStartIndex + index ) ;
     }
     return this->candidate ;
     //if ( this->candidate ) 
@@ -210,7 +201,7 @@ bool Engine::updateCandidate( int index ) {
 }
 
 
-QString Engine::getCode() const {
+QString Worker::getCode() const {
     if ( this->keyboardLayout == FullKeyboardLayout ) 
         return this->lookup->spliter.code ;
     else if ( this->keyboardLayout == T9KeyboardLayout ) 
@@ -219,21 +210,21 @@ QString Engine::getCode() const {
         return "" ;
 }
 
-QString Engine::getWord() const {
+QString Worker::getWord() const {
     if ( this->candidate ) 
         return *(lookup::get_word( this->candidate )) ;
     else 
         return "" ;
 }
 
-QString Engine::getPreeditCode() const {
+QString Worker::getPreeditCode() const {
     if ( this->candidate ) 
         return *(lookup::get_preedit( this->candidate )) ;
     else
         return "" ;
 }
 
-QString Engine::getInvalidCode() const {
+QString Worker::getInvalidCode() const {
     if ( this->keyboardLayout == FullKeyboardLayout ) {
         if ( this->lookup->spliter.code.isEmpty() )
             return "" ;
@@ -250,25 +241,25 @@ QString Engine::getInvalidCode() const {
         return "" ;
 }
 
-QString Engine::getSelectedWord() const { return *(this->selectedWord) ; }
+QString Worker::getSelectedWord() const { return *(this->selectedWord) ; }
 
-bool Engine::checkCommit() {
-    bool flag = false ;
-    if ( !this->selectedWord->isEmpty() && this->getCodeLength() <= 0 ) {
-        emit this->sendCommit( *(this->selectedWord) ) ;
-        emit this->preeditEnd() ;
-        this->commit() ;
-        flag = true ;
-    }
-    return flag ;
-}
+//bool Worker::checkCommit() {
+    //bool flag = false ;
+    //if ( !this->selectedWord->isEmpty() && this->getCodeLength() <= 0 ) {
+        //emit this->sendCommit( *(this->selectedWord) ) ;
+        //emit this->preeditEnd() ;
+        //this->commit() ;
+        //flag = true ;
+    //}
+    //return flag ;
+//}
 
-bool Engine::select( int index ) {
+bool Worker::select( int index ) {
     bool flag = false ;
     if ( this->getCodeLength() > 0 ) {
         if ( this->keyboardLayout == FullKeyboardLayout ) {
             index = this->pageStartIndex + index ;
-            const lookup::Candidate* candidate = this->lookup->getCand( index ) ;
+            const lookup::Candidate* candidate = this->lookup->getCandidate( index ) ;
 
             if ( candidate ) {
                 qreal freq = -0x1000 ;
@@ -276,7 +267,7 @@ bool Engine::select( int index ) {
                     int halfIndex = ( candidate->second + index ) / 2 ;
                     if ( halfIndex < 2 ) 
                         halfIndex = 0 ;
-                    const lookup::Candidate* candidate = this->lookup->getCand( halfIndex ) ;
+                    const lookup::Candidate* candidate = this->lookup->getCandidate( halfIndex ) ;
                     freq = lookup::get_freq( candidate ) ;
                     if ( freq <= 0.1 ) 
                         freq = 1.1 ;
@@ -294,12 +285,12 @@ bool Engine::select( int index ) {
                 if ( this->getInvalidCodeLength() > 0 ) {
                     QString code( this->getInvalidCode() ) ;
                     //qDebug() << "r" << code ; 
-                    this->lookup->reset() ;
+                    this->lookup->clearCode() ;
                     this->lookup->setCode( code ) ;
                     this->pageStartIndex = 0 ;
                 }
                 else {
-                    this->lookup->reset() ;
+                    this->lookup->clearCode() ;
                     this->pageStartIndex = 0 ;
                 }
 
@@ -309,7 +300,7 @@ bool Engine::select( int index ) {
         }
         else if ( this->keyboardLayout == T9KeyboardLayout ) {
             index = this->pageStartIndex + index ;
-            const lookup::Candidate* candidate = this->t9lookup->getCand( index ) ;
+            const lookup::Candidate* candidate = this->t9lookup->getCandidate( index ) ;
 
             if ( candidate ) {
                 qreal freq = -0x1000 ;
@@ -317,7 +308,7 @@ bool Engine::select( int index ) {
                     int halfIndex = ( candidate->second + index ) / 2 ;
                     if ( halfIndex < 2 ) 
                         halfIndex = 0 ;
-                    const lookup::Candidate* candidate = this->t9lookup->getCand( halfIndex ) ;
+                    const lookup::Candidate* candidate = this->t9lookup->getCandidate( halfIndex ) ;
                     freq = lookup::get_freq( candidate ) ;
                     if ( freq <= 0.1 ) 
                         freq = 1.1 ;
@@ -335,12 +326,12 @@ bool Engine::select( int index ) {
                 if ( this->getInvalidCodeLength() > 0 ) {
                     QString code( this->getInvalidCode() ) ;
                     //qDebug() << "r" << code ; 
-                    this->t9lookup->reset() ;
+                    this->t9lookup->clearCode() ;
                     this->t9lookup->setCode( code ) ;
                     this->pageStartIndex = 0 ;
                 }
                 else {
-                    this->t9lookup->reset() ;
+                    this->t9lookup->clearCode() ;
                     this->pageStartIndex = 0 ;
                 }
                 flag = true ;
@@ -350,7 +341,7 @@ bool Engine::select( int index ) {
     }
     return flag ;
 }
-bool Engine::deselect() {
+bool Worker::deselect() {
     bool flag = false ;
     if ( !this->selectedWord->isEmpty() ) {
         QString code ;
@@ -358,7 +349,7 @@ bool Engine::deselect() {
 
         if ( this->keyboardLayout == FullKeyboardLayout ) {
             code.append( this->lookup->spliter.code ) ;
-            this->lookup->reset() ;
+            this->lookup->clearCode() ;
             this->lookup->setCode( code ) ;
             this->pageStartIndex = 0 ;
         }
@@ -366,7 +357,7 @@ bool Engine::deselect() {
             for ( int i = 0 ; i < code.length() ; i++ ) 
                 code[i] = this->t9lookup->tree.trans[ code.at(i).toAscii() - 'a' ] ;
             code.append( this->t9lookup->code ) ;
-            this->t9lookup->reset() ;
+            this->t9lookup->clearCode() ;
             this->t9lookup->setCode( code ) ;
             this->pageStartIndex = 0 ;
         }
@@ -375,21 +366,21 @@ bool Engine::deselect() {
     }
     return flag ;
 }
-void Engine::reset() {
+void Worker::reset() {
     if ( this->keyboardLayout == FullKeyboardLayout ) 
-        this->lookup->reset() ;
+        this->lookup->clearCode() ;
     else if ( this->keyboardLayout == T9KeyboardLayout ) 
-        this->t9lookup->reset() ;
+        this->t9lookup->clearCode() ;
     clear_selected( &(this->selected) ) ;
     this->pageStartIndex = 0 ;
 }
 
-bool Engine::appendCode( QChar code ) {
+bool Worker::appendCode( QChar code ) {
     bool flag = false ;
     if ( this->keyboardLayout == FullKeyboardLayout ) {
         if ( code >= 'a' && code <= 'z' ) {
-            if ( this->lookup->spliter.code.isEmpty() )
-                emit this->preeditStart() ;
+            //if ( this->lookup->spliter.code.isEmpty() )
+                //emit this->preeditStart() ;
             this->lookup->appendCode( code ) ;
             this->pageStartIndex = 0 ;
             flag = true ;
@@ -397,8 +388,8 @@ bool Engine::appendCode( QChar code ) {
     }
     else if ( this->keyboardLayout == T9KeyboardLayout ) {
         if ( code >= '2' && code <= '9' ) {
-            if ( this->t9lookup->code.isEmpty() )
-                emit this->preeditStart() ;
+            //if ( this->t9lookup->code.isEmpty() )
+                //emit this->preeditStart() ;
             this->t9lookup->appendCode( code ) ;
             this->pageStartIndex = 0 ;
             flag = true ;
@@ -407,10 +398,11 @@ bool Engine::appendCode( QChar code ) {
     return flag ;
 }
 
-bool Engine::appendCode( const QString& code ) {
-    return this->appendCode( code.at(0) ) ;
-}
-bool Engine::popCode() {
+//bool Worker::appendCode( const QString& code ) {
+    //return this->appendCode( code.at(0) ) ;
+//}
+
+bool Worker::popCode() {
     bool flag = false ;
     if ( this->keyboardLayout == FullKeyboardLayout ) {
         if ( !this->lookup->spliter.code.isEmpty() ) {
@@ -429,24 +421,27 @@ bool Engine::popCode() {
     return flag ;
 }
 
-void Engine::commit() {
-    if ( this->selectedWord->length() < 6 ) {
-        const QString* key = &(this->selected.first.first) ;
-        qreal freq = this->selected.second.second.last() ;
-        freq = this->lookup->dict.update( *key, *(this->selectedWord), freq ) ;
-        if ( key->count( QChar('\'') ) <= 0 )
-            split::add_key( &(this->lookup->spliter.keySet), *key ) ;
-        fit::add_key( &(this->lookup->keyMap), *key ) ;
-        this->t9lookup->tree.addKey( *key ) ;
-        if ( this->logFile ) {
-            (*this->textStream) << *key << QChar( ' ' ) << *(this->selectedWord) << QChar( ' ' ) << freq << QChar( '\n' ) ;
-            //this->flushLog() ;
+void Worker::commit() {
+    if ( !this->selectedWord->isEmpty() && this->getCodeLength() <= 0 ) {
+        if ( this->selectedWord->length() < 6 ) {
+            const QString* key = &(this->selected.first.first) ;
+            qreal freq = this->selected.second.second.last() ;
+            //freq = this->lookup->dict.update( *key, *(this->selectedWord), freq ) ;
+            this->lookup->dict.insert( *key, *(this->selectedWord), freq ) ;
+            if ( key->count( QChar('\'') ) <= 0 )
+                split::add_key( &(this->lookup->spliter.keySet), *key ) ;
+            fit::add_key( &(this->lookup->keyMap), *key ) ;
+            this->t9lookup->tree.addKey( *key ) ;
+            //if ( this->logFile ) {
+                //(*this->textStream) << *key << QChar( ' ' ) << *(this->selectedWord) << QChar( ' ' ) << freq << QChar( '\n' ) ;
+                //this->flushLog() ;
+            //}
         }
+        this->reset() ;
     }
-    this->reset() ;
 }
 
-bool Engine::setKeyboardLayout( KeyboardLayout layout ) {
+bool Worker::setKeyboardLayout( Worker::KeyboardLayout layout ) {
     if ( layout != this->keyboardLayout ) {
         this->reset() ;
         this->keyboardLayout = layout ;
@@ -456,17 +451,16 @@ bool Engine::setKeyboardLayout( KeyboardLayout layout ) {
         return false ;
 }
 
-bool Engine::setKeyboardLayout( int layout ) {
-    if ( layout == 0 ) 
-        return this->setKeyboardLayout( UnknownKeyboardLayout ) ;
-    else if ( layout == 1 ) 
-        return this->setKeyboardLayout( FullKeyboardLayout ) ;
-    else if ( layout == 2 ) 
-        return this->setKeyboardLayout( T9KeyboardLayout ) ;
-    else 
-        return false ;
-}
+//bool Worker::setKeyboardLayout( int layout ) {
+    //if ( layout == 0 ) 
+        //return this->setKeyboardLayout( UnknownKeyboardLayout ) ;
+    //else if ( layout == 1 ) 
+        //return this->setKeyboardLayout( FullKeyboardLayout ) ;
+    //else if ( layout == 2 ) 
+        //return this->setKeyboardLayout( T9KeyboardLayout ) ;
+    //else 
+        //return false ;
+//}
 
 }
-
 

@@ -93,7 +93,7 @@ int main( int argc, char** argv ) {
         //}
         //while ( !t9lup.code.isEmpty() )
             //t9lup.popCode() ;
-        //lup.reset() ;
+        //lup.clearCode() ;
 
         //for ( int i = 0 ; i < s.length() ; i++ ) 
             //lup.appendCode( s[i] ) ;
@@ -105,7 +105,7 @@ int main( int argc, char** argv ) {
         }
         //while ( !lup.spliter.code.isEmpty() )
             //lup.popCode() ;
-        //lup.reset() ;
+        //lup.clearCode() ;
 
     }
 }

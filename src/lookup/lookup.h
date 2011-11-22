@@ -30,6 +30,7 @@ inline void check_cand( QList<Candidate>* cand_list, int length ) {
     if ( length >= cand_list->length() ) 
         cand_list->append( Candidate( CandPair( KeyPair( NULL, NULL ), WordPair( NULL, 0 ) ), 0 ) ) ;
 }
+
 inline void set_cand( Candidate* cand, const QString* key, const QString* preedit, const QString* word, qreal freq, int start_index ) {
     cand->first.first.first = key ;
     cand->first.first.second = preedit ;
@@ -105,6 +106,7 @@ public :
         this->candCacheIndex = this->lookupCache.length() - 1 ;
         this->candStartIndex = 0 ;
     }
+
     inline void popCode() {
         this->pickCache.clear() ;
         this->usedKeySet.clear() ;
@@ -124,25 +126,29 @@ public :
             this->candStartIndex = 0 ;
         }
     }
-    inline void reset() {
+
+    inline void clearCode() {
         this->pickCache.clear() ;
         this->usedKeySet.clear() ;
-        this->spliter.clear() ;
+        this->spliter.clearCode() ;
         this->lookupCache.clear() ;
         this->preeditCache.clear() ;
         this->candCacheIndex = 0 ;
         this->candStartIndex = 0 ;
         this->candLength = 0 ;
     }
+    
     inline void setCode( const QString& code ) {
-        this->reset() ;
+        this->clearCode() ;
         for( int i = 0 ; i < code.length() ; i++ )
             this->appendCode( code.at(i) ) ;
     }
+    
     //inline void appendCode( const QString& code ) {
         //for( int i = 0 ; i < code.length() ; i++ )
             //this->appendCode( code.at(i) ) ;
     //}
+    
     inline bool checkCache() {
         bool flag = false ;
         if ( this->candCacheIndex >= 0 ) {
@@ -175,10 +181,10 @@ public :
         }
         return flag ;
     }
-    inline const Candidate* getCand( int index ) {
+
+    inline const Candidate* getCandidate( int index ) {
+        //bool flag = !this->spliter.code.isEmpty() ;
         bool flag = true ;
-        //bool flag = true && !this->spliter.code.isEmpty() ;
-        //while ( flag && this->candList.length() <= index ) {
         while ( flag && this->candLength <= index ) {
             const QString* key ; const QString* preedit ; const QString* word ; qreal freq ;
             pick::pick( &(this->pickCache), &key, &preedit, &word, &freq ) ;

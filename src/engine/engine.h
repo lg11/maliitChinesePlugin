@@ -1,127 +1,73 @@
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef ENGINE_ENGINE_H
+#define ENGINE_ENGINE_H
 
-#include <QObject>
-#include <QPair>
-#include <QList>
-#include <QString>
-#include <QFile>
-#include <QTimer>
-#include <QTextStream>
+#include "worker.h"
 
-namespace lookup {
-class Lookup ;
-}
+#include <QDebug>
 
-namespace t9 {
-class T9Lookup ;
-}
-
-namespace handle {
-class Handle ;
-}
 
 namespace engine {
 
-typedef QPair<const QString*, const QString*> KeyPair ;
-typedef QPair<const QString*, qreal > WordPair ;
-typedef QPair<KeyPair, WordPair> CandPair ;
-typedef QPair<CandPair, int> Candidate ;
-
-typedef QPair<QString, QString> SelectedKeyPair ;
-typedef QPair< QString, QList<qreal> > SelectedWordPair ;
-typedef QPair<SelectedKeyPair, SelectedWordPair> SelectedPair ;
-
 class Engine : public QObject {
     Q_OBJECT
+public :
+    Worker* worker ;
+    int pageLength ;
 
-    friend class handle::Handle ;
+    Engine( QObject* parent = 0 ) : QObject( parent), worker( new Worker() ), pageLength( 5 ) {
+        this->worker->setKeyboardLayout( Worker::FullKeyboardLayout ) ;
+    }
 
-signals :
-    void preeditStart() ;
-    void preeditEnd() ;
-    void sendCommit( const QString& text ) ;
-    //void sendCommit( QChar ch ) ;
-    void candidateUpdate() ;
+    ~Engine() { delete this->worker ; }
 
-public:
-    Q_ENUMS( KeyboardLayout )
-    enum KeyboardLayout { UnknownKeyboardLayout = 0, FullKeyboardLayout = 1, T9KeyboardLayout = 2 } ;
+    void load( const QString& path ) { this->worker->load( path ) ; }
 
-    lookup::Lookup* lookup ;
-    t9::T9Lookup* t9lookup ;
-    SelectedPair selected ;
-    QString* selectedWord ;
-    int pageStartIndex ;
-    const Candidate* candidate ;
-    KeyboardLayout keyboardLayout ;
-    QFile* logFile ;
-    QTextStream* textStream ;
-    QTimer flushTimer ;
+    void appendCode( QChar code ) {
+        this->worker->appendCode( code ) ; 
+    }
 
-    Engine( QObject* parent = NULL ) ;
+    void appendCode( const QString& code ) {
+        if ( code.length() > 0 ) 
+            this->appendCode( code[0] ) ;
+    }
 
-    ~Engine() ;
+    void popCode() { this->worker->popCode() ; }
 
-public slots :
+    void reset() { this->worker->reset() ; }
 
-    void startLog( const QString& path ) ;
+    void select( int index ) { this->worker->select( index ) ; }
 
-    void stopLog() ;
+    void deselect() { this->worker->deselect() ; }
 
-    void flushLog() ;
-    
-    void load( const QString& path ) ;
-    
-    bool prevPage( int pageLength ) ;
-    
-    bool nextPage( int pageLength ) ;
-    
-    int getCodeLength() const ;
-    
-    int getPreeditCodeLength() const ;
-    
-    int getInvalidCodeLength() const ;
+    QString getCandidateString() {
+        qDebug() << "getCand" ;
+        QString str ;
+        bool flag ;
+        flag = this->worker->updateCandidate( 0 ) ;
+        if ( flag || this->worker->getSelectedWordLength() > 0 )
+            str.append( this->worker->getSelectedWord() ) ;
+        str.append( QChar(',') ) ;
+        if ( flag )
+            str.append( this->worker->getPreeditCode() ) ;
+        str.append( QChar(',') ) ;
+        if ( flag || this->worker->getInvalidCodeLength() > 0 )
+            str.append( this->worker->getInvalidCode() ) ;
+        str.append( QChar(',') ) ;
+        if ( flag )
+            str.append( this->worker->getWord() ) ;
+        for ( int i = 1 ; i < this->pageLength ; i++ ) {
+            str.append( QChar(',') ) ;
+            flag = this->worker->updateCandidate( i ) ;
+            if ( flag )
+                str.append( this->worker->getWord() ) ;
+        }
 
-    //int getSelectedLength() const ;
-
-    int getSelectedWordLength() const ;
-   
-    bool updateCandidate( int index ) ;
-    
-    QString getCode() const ;
-
-    QString getWord() const ;
-    
-    QString getPreeditCode() const ;
-
-    QString getInvalidCode() const ;
-
-    QString getSelectedWord() const ;
-
-    bool checkCommit() ;
-
-    bool select( int index ) ;
-
-    bool deselect() ;
-
-    void reset() ;
-
-    bool appendCode( QChar code ) ;
-
-    bool appendCode( const QString& code ) ;
-
-    bool popCode() ;
-
-    void commit() ;
-
-    bool setKeyboardLayout( KeyboardLayout layout ) ;
-
-    bool setKeyboardLayout( int layout ) ;
+        qDebug() << str ;
+        return str ;
+    }
 
 } ;
 
 }
 
-#endif
-
+#endif // ENGINE_ENGINE_H

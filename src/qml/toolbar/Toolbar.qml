@@ -18,23 +18,18 @@ Item {
     }
     Row {
         id : leftRow
-        spacing : 4
         anchors.verticalCenter : parent.verticalCenter
         anchors.left : parent.left
-        anchors.leftMargin : 4
     }
     Row {
         id : centerRow
-        spacing : 4
         anchors.centerIn : parent
     }
     Row {
         id : rightRow
-        spacing : 4
         anchors.verticalCenter : parent.verticalCenter
         anchors.right : parent.right
         /*layoutDirection : Qt.RightToLeft*/
-        anchors.rightMargin : 4
     }
 
     function clear() {
@@ -57,15 +52,12 @@ Item {
     }
 
     function setButton( button, item ) {
-        console.log( "set id" )
         button.iconId = item.iconId
-        console.log( "set path" )
         button.iconPath = item.iconPath
-        console.log( "set text" )
         button.text = item.text
         button.sizePercent = item.size / 100.00
-        console.log( "set done", button.height, button.width, button.iconId, button.iconPath )
     }
+
     function update() {
         clear()
         var l = toolbarData.items.length
@@ -74,7 +66,7 @@ Item {
             var button
             if ( item.alignment == Qt.AlignLeft ) {
                 console.log( "left" )
-                button = buttonComponent.createObject( leftRow, {} )
+                button = buttonComponent.createObject( leftRow, { padding : 8 } )
                 setButton( button, item )
             }
             else if ( item.alignment == Qt.AlignRight ) {

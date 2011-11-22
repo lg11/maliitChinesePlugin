@@ -106,7 +106,7 @@ public :
         if ( this->stringList.isEmpty() ) 
             this->stringList.append( this->emptyString ) ;
     }
-    inline void clear() { this->code.clear() ; this->stringList.clear() ; this->stringList.append( this->emptyString ) ; }
+    inline void clearCode() { this->code.clear() ; this->stringList.clear() ; this->stringList.append( this->emptyString ) ; }
 } ;
 
 }

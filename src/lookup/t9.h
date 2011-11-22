@@ -132,7 +132,7 @@ public :
             this->candStartIndex = 0 ;
         }
     }
-    inline void reset() {
+    inline void clearCode() {
         this->code.clear() ;
         this->pickCache.clear() ;
         this->usedKeySet.clear() ;
@@ -143,7 +143,7 @@ public :
         this->candLength = 0 ;
     }
     inline void setCode( const QString& code ) {
-        this->reset() ;
+        this->clearCode() ;
         for( int i = 0 ; i < code.length() ; i++ )
             this->appendCode( code.at(i) ) ;
     }
@@ -177,7 +177,7 @@ public :
         }
         return flag ;
     }
-    inline const Candidate* getCand( int index ) {
+    inline const Candidate* getCandidate( int index ) {
         bool flag = true ;
         //bool flag = true && !this->spliter.code.isEmpty() ;
         //while ( flag && this->candList.length() <= index ) {
