@@ -1,43 +1,47 @@
 import QtQuick 1.1
 
 Item {
+    id : keyboard
     Column {
         Row {
-            Key { text : "Q" }
-            Key { text : "W" }
-            Key { text : "E" }
-            Key { text : "R" }
-            Key { text : "T" }
-            Key { text : "Y" }
-            Key { text : "U" }
-            Key { text : "I" }
-            Key { text : "O" }
-            Key { text : "P" }
+            Key { keycode : "Q" }
+            Key { keycode : "W" }
+            Key { keycode : "E" }
+            Key { keycode : "R" }
+            Key { keycode : "T" }
+            Key { keycode : "Y" }
+            Key { keycode : "U" }
+            Key { keycode : "I" }
+            Key { keycode : "O" }
+            Key { keycode : "P" }
         }
         Row {
-            Key { text : "A" }
-            Key { text : "S" }
-            Key { text : "D" }
-            Key { text : "F" }
-            Key { text : "G" }
-            Key { text : "H" }
-            Key { text : "J" }
-            Key { text : "K" }
-            Key { text : "L" }
+            Key { keycode : "A" }
+            Key { keycode : "S" }
+            Key { keycode : "D" }
+            Key { keycode : "F" }
+            Key { keycode : "G" }
+            Key { keycode : "H" }
+            Key { keycode : "J" }
+            Key { keycode : "K" }
+            Key { keycode : "L" }
         }
         Row {
-            Key { text : "Z" }
-            Key { text : "X" }
-            Key { text : "C" }
-            Key { text : "V" }
-            Key { text : "B" }
-            Key { text : "N" }
-            Key { text : "M" }
-            Key { text : "K" }
-            Key { text : "L" }
+            Key { keycode : "Z" }
+            Key { keycode : "X" }
+            Key { keycode : "C" }
+            Key { keycode : "V" }
+            Key { keycode : "B" }
+            Key { keycode : "N" }
+            Key { keycode : "M" }
+            Key { keycode : "K" }
+            Key { keycode : "L" }
         }
         Row {
-            Key { text : "S" }
+            Key { keycode : "S" }
         }
-}
+    }
+
+    function processKeyEvent( keycode ) {
+    }
 }

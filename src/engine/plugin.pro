@@ -15,5 +15,6 @@ HEADERS += \
 
 SOURCES += \
     plugin.cpp \
+    engine.cpp \
     worker.cpp \
 

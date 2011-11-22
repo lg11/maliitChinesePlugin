@@ -1,7 +1,7 @@
 import QtQuick 1.1
 
 BaseKey {
-    property alias text : label.text
+    property alias keycode : label.text
     Rectangle {
         id : bgRect
         anchors.fill : parent
