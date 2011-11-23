@@ -1,16 +1,24 @@
 #include "engine.h"
 #include "worker.h"
 
+#include <QList>
+#include <QString>
+
 namespace engine {
 
 class EnginePrivate {
 public :
     Worker* worker ;
     int pageLength ;
-    EnginePrivate() : worker( new Worker() ), pageLength( 5 ) {
+    EnginePrivate() :
+        worker( new Worker() ), 
+        pageLength( 5 )
+    {
         this->worker->setKeyboardLayout( Worker::FullKeyboardLayout ) ;
     }
-    ~EnginePrivate() { delete this->worker ; }
+    ~EnginePrivate() {
+        delete this->worker ;
+    }
 } ;
 
 Engine::Engine( QObject* parent ) :
@@ -31,6 +39,7 @@ void Engine::load( const QString& path ) {
 void Engine::appendCode( QChar code ) {
     Q_D( Engine ) ;
     d->worker->appendCode( code ) ; 
+    emit this->updated() ;
 }
 
 void Engine::appendCode( const QString& code ) {
@@ -38,32 +47,42 @@ void Engine::appendCode( const QString& code ) {
         this->appendCode( code[0] ) ;
 }
 
+void Engine::appendCode( int keycode ) {
+    QChar code = keycode + 'a' - 'A' ;
+    this->appendCode( code ) ; 
+}
+
 void Engine::popCode() {
     Q_D( Engine ) ;
     d->worker->popCode() ;
+    emit this->updated() ;
 }
 
 void Engine::reset() {
     Q_D( Engine ) ;
     d->worker->reset() ;
+    emit this->updated() ;
 }
 
 void Engine::select( int index ) {
     Q_D( Engine ) ;
     d->worker->select( index ) ;
+    emit this->updated() ;
 }
 
 void Engine::deselect() {
     Q_D( Engine ) ;
     d->worker->deselect() ;
+    emit this->updated() ;
 }
 
 QString Engine::getCandidateString() {
     Q_D( Engine ) ;
-    qDebug() << "getCand" ;
     QString str ;
+
     bool flag ;
     flag = d->worker->updateCandidate( 0 ) ;
+    
     if ( flag || d->worker->getSelectedWordLength() > 0 )
         str.append( d->worker->getSelectedWord() ) ;
     str.append( QChar(',') ) ;
@@ -82,7 +101,7 @@ QString Engine::getCandidateString() {
             str.append( d->worker->getWord() ) ;
     }
 
-    qDebug() << str ;
+    //qDebug() << str ;
     return str ;
 }
 

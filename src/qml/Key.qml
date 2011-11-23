@@ -1,7 +1,10 @@
 import QtQuick 1.1
 
 BaseKey {
-    property alias keycode : label.text
+    property int keycode 
+    signal keyPressed( variant event )
+    signal keyReleased( variant event )
+    /*property alias text : label.text*/
     Rectangle {
         id : bgRect
         anchors.fill : parent
@@ -9,6 +12,7 @@ BaseKey {
         color : "gray"
         Text {
             id : label
+            text : keydata.keysym[keycode][0]
             anchors.centerIn : parent
             font.pixelSize : 22
             font.bold : true
@@ -26,4 +30,8 @@ BaseKey {
             PropertyChanges { target : bgRect ; color : "blue" }
         }
     ]
+
+    /*onReleased : {*/
+        /*var event = KeyEvent()*/
+    /*}*/
 }

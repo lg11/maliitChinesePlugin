@@ -15,6 +15,9 @@ Rectangle {
 
     Style { id : style }
     Engine { id : engine }
+
+    EditToolBar {}
+
     RootTouchArea {
         id : root
         anchors.centerIn : parent

@@ -18,6 +18,8 @@ Item {
         onCursorRectangleChanged : { inputmethod.cursorRectChanged( cursorRectangle ) }
         font.pixelSize : 22
         textFormat : TextEdit.PlainText
+        wrapMode : TextEdit.WordWrap
+        /*activeFocusOnPress : false*/
     }
 
 }
