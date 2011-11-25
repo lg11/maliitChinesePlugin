@@ -17,6 +17,9 @@ inline void append_selected( SelectedPair* pair, const QString* key, const QStri
     pair->first.first.append( *key ) ;
     pair->first.second.append( *preedit ) ;
     pair->second.first.append( *word ) ;
+    int count = key->count( QChar('\'') ) ;
+    for ( int i = 0 ; i < count ; i ++ ) ;
+        pair->second.second.append( -1 ) ;
     pair->second.second.append( freq ) ;
 }
 
@@ -31,7 +34,8 @@ inline void pop_selected( SelectedPair* pair, QString* code ) {
     if ( pair->second.first.length() > 1 ) {
         int index ;
         int length ;
-
+        
+        //qDebug() << *pair ;
         index = pair->first.first.lastIndexOf( QChar('\'') ) ;
         length = pair->first.first.length() ;
         pair->first.first.chop( length - index ) ;
@@ -422,23 +426,21 @@ bool Worker::popCode() {
 }
 
 void Worker::commit() {
-    if ( !this->selectedWord->isEmpty() && this->getCodeLength() <= 0 ) {
-        if ( this->selectedWord->length() < 6 ) {
-            const QString* key = &(this->selected.first.first) ;
-            qreal freq = this->selected.second.second.last() ;
-            //freq = this->lookup->dict.update( *key, *(this->selectedWord), freq ) ;
-            this->lookup->dict.insert( *key, *(this->selectedWord), freq ) ;
-            if ( key->count( QChar('\'') ) <= 0 )
-                split::add_key( &(this->lookup->spliter.keySet), *key ) ;
-            fit::add_key( &(this->lookup->keyMap), *key ) ;
-            this->t9lookup->tree.addKey( *key ) ;
-            //if ( this->logFile ) {
-                //(*this->textStream) << *key << QChar( ' ' ) << *(this->selectedWord) << QChar( ' ' ) << freq << QChar( '\n' ) ;
-                //this->flushLog() ;
-            //}
-        }
-        this->reset() ;
+    if ( this->selectedWord->length() < 6 ) {
+        const QString* key = &(this->selected.first.first) ;
+        qreal freq = this->selected.second.second.last() ;
+        //freq = this->lookup->dict.update( *key, *(this->selectedWord), freq ) ;
+        this->lookup->dict.insert( *key, *(this->selectedWord), freq ) ;
+        if ( key->count( QChar('\'') ) <= 0 )
+            split::add_key( &(this->lookup->spliter.keySet), *key ) ;
+        fit::add_key( &(this->lookup->keyMap), *key ) ;
+        this->t9lookup->tree.addKey( *key ) ;
+        //if ( this->logFile ) {
+            //(*this->textStream) << *key << QChar( ' ' ) << *(this->selectedWord) << QChar( ' ' ) << freq << QChar( '\n' ) ;
+            //this->flushLog() ;
+        //}
     }
+    this->reset() ;
 }
 
 bool Worker::setKeyboardLayout( Worker::KeyboardLayout layout ) {

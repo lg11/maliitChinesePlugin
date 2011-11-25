@@ -1,7 +1,7 @@
 #ifndef INPUTMETHOD_H
 #define INPUTMETHOD_H
 
-#include "toolbar/data.h"
+//#include "toolbar/data.h"
 
 #include <mabstractinputmethod.h>
 
@@ -62,6 +62,7 @@ public :
 public slots:
     void setScreenRegion( const QRect &area ) ;
     void setInputMethodArea( const QRect &area ) ;
+    void sendPreedit( const QString& black, const QString& red ) ;
     void sendCommit( const QString& text ) ;
 
 private :

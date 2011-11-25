@@ -2,9 +2,9 @@ import QtQuick 1.1
 
 BaseKey {
     property int keycode 
-    signal keyPressed( variant event )
-    signal keyReleased( variant event )
     /*property alias text : label.text*/
+    height : keyboard.keyHeight
+    width : keyboard.keyWidth
     Rectangle {
         id : bgRect
         anchors.fill : parent
@@ -20,8 +20,6 @@ BaseKey {
             color : "white"
         }
     }
-    width : 480 / 10
-    height : 400 / 4
 
     states : [
         State {
@@ -31,7 +29,7 @@ BaseKey {
         }
     ]
 
-    /*onReleased : {*/
-        /*var event = KeyEvent()*/
-    /*}*/
+    onReleased : {
+        keyboard.processKeyEvent( keycode, 0 )
+    }
 }

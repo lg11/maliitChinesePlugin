@@ -5,13 +5,13 @@ Rectangle {
     visible : text.length > 0
     color : "gray"
     height : label.paintedHeight + 4
-    width : label.paintedWidth + 8
+    width : label.paintedWidth + 16
     Text {
         id : label
         color : "white"
         anchors.centerIn : parent
-        onTextChanged : {
-            console.log( text )
-        }
+        textFormat : Text.PlainText
+        font.pixelSize : 26
+        /*onTextChanged : console.log( text )*/
     }
 }

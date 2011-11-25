@@ -1,7 +1,8 @@
 #ifndef ENGINE_ENGINE_H
 #define ENGINE_ENGINE_H
 
-#include <QDeclarativeListProperty>
+#include <QObject>
+#include <QKeyEvent>
 
 namespace engine {
 
@@ -12,20 +13,15 @@ class Engine : public QObject {
     
 signals :
     void updated() ;
+    void commit( QString text ) ;
 
 public :
-    Engine( QObject* parent = 0 ) ;
+    explicit Engine( QObject* parent = 0 ) ;
     ~Engine() ;
 
 public slots :
     void load( const QString& path ) ;
-    void appendCode( QChar code ) ;
-    void appendCode( const QString& code ) ;
-    void appendCode( int keycode ) ;
-    void popCode() ;
-    void reset() ; 
-    void select( int index ) ;
-    void deselect() ;
+    bool processKeyEvent( QEvent::Type type, Qt::Key keycode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count ) ;
     QString getCandidateString() ;
 private :
     Q_DISABLE_COPY( Engine ) ;

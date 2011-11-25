@@ -2,10 +2,11 @@
 
 #include "plugin.h"
 #include "inputmethod.h"
-#include "toolbar/data.h"
-#include "toolbar/item.h"
-#include "toolbar/icon.h"
-#include "settings.h"
+#include "engine.h"
+//#include "toolbar/data.h"
+//#include "toolbar/item.h"
+//#include "toolbar/icon.h"
+//#include "settings.h"
 
 namespace plugin {
 
@@ -30,9 +31,10 @@ public :
 
 Plugin::Plugin() : d_ptr( new PluginPrivate ) {
     qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.inputmethod", 1, 0, "InputMethod", "inputmethod" ) ;
-    qmlRegisterType<toolbar::Data> ( "me.inputmethod.toolbar", 1, 0, "ToolbarData" ) ;
-    qmlRegisterType<toolbar::Item> ( "me.inputmethod.toolbar", 1, 0, "ToolbarItem" ) ;
-    qmlRegisterType<toolbar::Icon> ( "me.inputmethod.toolbar", 1, 0, "ToolbarIcon" ) ;
+    qmlRegisterUncreatableType<engine::Engine> ( "me.inputmethod", 1, 0, "Engine", "engine" ) ;
+    //qmlRegisterType<toolbar::Data> ( "me.inputmethod.toolbar", 1, 0, "ToolbarData" ) ;
+    //qmlRegisterType<toolbar::Item> ( "me.inputmethod.toolbar", 1, 0, "ToolbarItem" ) ;
+    //qmlRegisterType<toolbar::Icon> ( "me.inputmethod.toolbar", 1, 0, "ToolbarIcon" ) ;
 }
 
 Plugin::~Plugin() {
@@ -54,10 +56,11 @@ MAbstractInputMethod* Plugin::createInputMethod( MAbstractInputMethodHost *host,
 }
 
 MAbstractInputMethodSettings* Plugin::createInputMethodSettings() {
-    Q_D( Plugin ) ;
-    if ( !d->settings )
-        d->settings = new settings::Settings ;
-    return d->settings ;
+    //Q_D( Plugin ) ;
+    //if ( !d->settings )
+        //d->settings = new settings::Settings ;
+    //return d->settings ;
+    return 0 ;
 }
 
 QSet<MInputMethod::HandlerState> Plugin::supportedStates() const {

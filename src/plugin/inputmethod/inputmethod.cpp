@@ -1,62 +1,40 @@
 #include "inputmethod.h"
+#include "inputmethodview.h"
+#include "engine.h"
 
-#include <QGraphicsView>
-#include <QGraphicsObject>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QUrl>
 #include <QRect>
 #include <QRegion>
 #include <QKeyEvent>
 
-#include <QDeclarativeEngine>
-#include <QDeclarativeContext>
-#include <QDeclarativeComponent>
-
 #include <mabstractinputmethodhost.h>
-#include <mimgraphicsview.h>
-#include <mtoolbardata.h>
-#include <mtoolbaritem.h>
-#include <mtoolbarlayout.h>
+//#include <mtoolbardata.h>
+//#include <mtoolbaritem.h>
+//#include <mtoolbarlayout.h>
 
 #include <QDebug>
 
-#include <QTextStream>
-
-#include <MLabel>
-
 namespace inputmethod {
-
-const QRect& display_rect( QWidget* widget = NULL ) {
-    static const QRect rect( widget ? QApplication::desktop()->screenGeometry( widget ) : QApplication::desktop()->screenGeometry() ) ;
-    return rect ;
-}
 
 class InputMethodPrivate {
 public :
-    Q_DECLARE_PUBLIC( InputMethod ) ;
-    InputMethod* const q_ptr ;
-    QGraphicsScene* const scene ;
-    QGraphicsView* const view ;
-    QDeclarativeEngine* const engine ;
-    QGraphicsObject* content ;
-    QDeclarativeComponent* component ;
+    //Q_DECLARE_PUBLIC( InputMethod ) ;
+    InputMethodView* const view ;
     QRect inputMethodArea ;
     int appOrientation ;
     QRect cursorRect ;
-    toolbar::Data* toolbarData ;
+    QList<MInputMethod::PreeditTextFormat> preeditFormat ;
+    engine::Engine* engine ;
+    //toolbar::Data* toolbarData ;
     QString debugString ;
     
-    InputMethodPrivate( InputMethod* inputmethod, QWidget* mainWindow ) :
-        q_ptr( inputmethod ) ,
-        scene( new QGraphicsScene( display_rect(), inputmethod ) ) ,
-        view( new MImGraphicsView( this->scene, mainWindow ) ) ,
-        engine( new QDeclarativeEngine( inputmethod ) ) ,
-        content( NULL ) ,
-        component( NULL ) ,
+    InputMethodPrivate( QWidget* mainWindow ) :
+        view( new InputMethodView( mainWindow ) ) ,
+        inputMethodArea() ,
         appOrientation( 0 ) ,
         cursorRect() ,
-        toolbarData( new toolbar::Data() ) ,
+        preeditFormat() ,
+        engine( new engine::Engine ) ,
+        //toolbarData( new toolbar::Data() ) ,
         debugString()
     {
         //ok = connect(imToolbar, SIGNAL(copyPasteRequest(CopyPasteState)),
@@ -75,51 +53,36 @@ public :
                      //this, SLOT(userHide()));
         //Q_ASSERT(ok);
 
-        this->engine->rootContext()->setContextProperty( "inputmethod", inputmethod ) ;
-        this->engine->rootContext()->setContextProperty( "toolbarData", this->toolbarData ) ;
+        this->preeditFormat.append( MInputMethod::PreeditTextFormat( 0, 0, MInputMethod::PreeditDefault ) ) ;
+        this->preeditFormat.append( MInputMethod::PreeditTextFormat( 0, 0, MInputMethod::PreeditNoCandidates ) ) ;
+        //this->engine->rootContext()->setContextProperty( "toolbarData", this->toolbarData ) ;
     }
 
     ~InputMethodPrivate() {
-        if ( this->content )
-            delete this->content ;
-        if ( this->component )
-            delete this->component ;
-        delete this->engine ;
         delete this->view ;
-        delete this->toolbarData ;
+        //delete this->toolbarData ;
     }
-
-    void show() {
-        if ( this->content )
-            this->content->show() ;
-    }
-
-    void hide() {
-        if ( this->content )
-            this->content->hide() ;
-    }
-
-    void load( const QString& path ) {
-        this->component = new QDeclarativeComponent( this->engine, QUrl( path ) ) ;
-        this->content = qobject_cast<QGraphicsObject*>( this->component->create() ) ;
-        this->scene->addItem( content ) ;
-    }
-
 } ;
 
 
 
-InputMethod::InputMethod( MAbstractInputMethodHost *host, QWidget *mainWindow ) : MAbstractInputMethod( host, mainWindow ), d_ptr( new InputMethodPrivate( this, mainWindow ) ) {
+InputMethod::InputMethod( MAbstractInputMethodHost *host, QWidget *mainWindow ) :
+    MAbstractInputMethod( host, mainWindow ),
+    d_ptr( new InputMethodPrivate( mainWindow ) )
+{
     qDebug() << "inputmethod" << "construct" ;
     Q_D( InputMethod ) ;
-    d->load( "/home/developer/qml/main.qml" ) ;
+    d->view->setInputMethod( this ) ;
+    d->view->setEngine( d->engine ) ;
+    d->view->load( "/opt/linputmehtod/qml/main.qml" ) ;
+    //qDebug() << d->engine ;
 
     QWidget* viewport = d->view->viewport() ;
 
     if ( viewport->nativeParentWidget() )
             viewport = viewport->nativeParentWidget() ;
 
-    const QRect& rect( display_rect( viewport ) ) ;
+    const QRect& rect( d->view->screenRect( viewport ) ) ;
     d->view->resize( rect.size() ) ;
     d->view->setSceneRect( rect ) ;
     d->view->show() ;
@@ -133,8 +96,7 @@ InputMethod::~InputMethod() { delete this->d_ptr ; }
 void InputMethod::show() {
     qDebug() << "inputmethod" << "show" ;
     Q_D( InputMethod ) ;
-    d->show() ;
-    //d->view->show() ;
+    d->view->showContent() ;
 
     const QRegion region( d->inputMethodArea ) ;
     this->inputMethodHost()->setScreenRegion( region ) ;
@@ -144,8 +106,7 @@ void InputMethod::show() {
 void InputMethod::hide() {
     qDebug() << "inputmethod" << "hide" ;
     Q_D( InputMethod ) ;
-    d->hide() ;
-    //d->view->hide() ;
+    d->view->hideContent() ;
 
     const QRegion region ;
     this->inputMethodHost()->setScreenRegion( region ) ;
@@ -159,7 +120,7 @@ void InputMethod::setPreedit( const QString &preeditString, int cursorPos ) {
 }
 
 void InputMethod::update() {
-    qDebug() << "inputmethod" << "update" ;
+    //qDebug() << "inputmethod" << "update" ;
     Q_D( InputMethod ) ;
     bool flag ;
     const QRect cursorRect( this->inputMethodHost()->cursorRectangle( flag ) ) ;
@@ -181,7 +142,11 @@ void InputMethod::handleMouseClickOnPreedit( const QPoint &pos, const QRect &pre
 
 void InputMethod::handleFocusChange( bool focusIn ) {
     qDebug() << "inputmethod" << "handleFocusChange" ;
-    Q_UNUSED( focusIn )
+    if ( focusIn ) {
+        this->inputMethodHost()->setRedirectKeys( true ) ;
+    }
+    //else
+        //this->hide() ;
 }
 
 void InputMethod::handleVisualizationPriorityChange( bool priority ) {
@@ -200,29 +165,33 @@ void InputMethod::handleAppOrientationChanged( int angle) {
     
     if ( d->appOrientation != angle ) {
         d->appOrientation = angle ;
-        d->toolbarData->setOrientation( angle ) ;
+        //d->toolbarData->setOrientation( angle ) ;
         emit this->appOrientationChanged( d->appOrientation ) ;
     }
 }
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
-    Q_D( InputMethod ) ;
+    //Q_D( InputMethod ) ;
     if ( toolbar ) {
-        d->toolbarData->set( toolbar ) ;
+        //d->toolbarData->set( toolbar ) ;
     }
 }
 
 void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count, quint32 nativeScanCode, quint32 nativeModifiers, unsigned long time) {
     qDebug() << "inputmethod" << "processKeyEvent" << keyCode ;
-    Q_UNUSED( keyType )
-    Q_UNUSED( keyCode )
-    Q_UNUSED( modifiers )
-    Q_UNUSED( text )
-    Q_UNUSED( autoRepeat )
-    Q_UNUSED( count )
+    Q_D( InputMethod ) ;
     Q_UNUSED( nativeScanCode )
     Q_UNUSED( nativeModifiers )
     Q_UNUSED( time )
+
+    bool flag = false ;
+    if ( d->engine ) {
+        flag = d->engine->processKeyEvent( keyType, keyCode, modifiers, text, autoRepeat, count ) ;
+    }
+    if ( !flag ) {
+        QKeyEvent event( keyType, keyCode, modifiers, text, autoRepeat, count ) ;
+        this->inputMethodHost()->sendKeyEvent( event ) ;
+    }
 }
 void InputMethod::setState( const QSet<MInputMethod::HandlerState> &state ) {
     qDebug() << "inputmethod" << "setState" ;
@@ -246,7 +215,7 @@ QList<InputMethod::MInputMethodSubView> InputMethod::subViews( MInputMethod::Han
     if ( state == MInputMethod::OnScreen ) {
         MAbstractInputMethod::MInputMethodSubView subView ;
         subView.subViewId = 250 ;
-        subView.subViewTitle = "cuteinputmethod" ;
+        subView.subViewTitle = "linputmethod" ;
         list.append(subView) ;
     }
 
@@ -281,11 +250,13 @@ bool InputMethod::imExtensionEvent( MImExtensionEvent *event) {
 }
 
 int InputMethod::screenWidth() const {
-    return display_rect().width() ;
+    Q_D( const InputMethod ) ;
+    return d->view->screenRect().width() ;
 }
 
 int InputMethod::screenHeight() const {
-    return display_rect().height() ;
+    Q_D( const InputMethod ) ;
+    return d->view->screenRect().height() ;
 }
 
 int InputMethod::appOrientation() const {
@@ -318,6 +289,42 @@ void InputMethod::setInputMethodArea( const QRect &area ) {
 }
 
 //void InputMethod::sendKeyEvent( const QString& text ) {}
+
+void InputMethod::sendPreedit( const QString& black, const QString& red ) {
+    Q_D( InputMethod ) ;
+    if ( red.isEmpty() ) {
+        if ( !black.isEmpty() ) {
+            d->preeditFormat[0].start = 0 ;
+            d->preeditFormat[0].length = black.length() ;
+            d->preeditFormat[1].start = black.length() ;
+            d->preeditFormat[1].length = 0 ;
+            this->inputMethodHost()->sendPreeditString( black, d->preeditFormat ) ;
+        }
+        else {
+            d->preeditFormat[0].start = 0 ;
+            d->preeditFormat[0].length = 0 ;
+            d->preeditFormat[1].start = 0 ;
+            d->preeditFormat[1].length = 0 ;
+            this->inputMethodHost()->sendPreeditString( "", d->preeditFormat ) ;
+        }
+    }
+    else if ( black.isEmpty() ) {
+        d->preeditFormat[0].start = 0 ;
+        d->preeditFormat[0].length = 0 ;
+        d->preeditFormat[1].start = 0 ;
+        d->preeditFormat[1].length = red.length() ;
+        this->inputMethodHost()->sendPreeditString( red, d->preeditFormat ) ;
+    }
+    else {
+        d->preeditFormat[0].start = 0 ;
+        d->preeditFormat[0].length = black.length() ;
+        d->preeditFormat[1].start = black.length() ;
+        d->preeditFormat[1].length = red.length()  ;
+        QString str( black ) ;
+        str.append( red ) ;
+        this->inputMethodHost()->sendPreeditString( str, d->preeditFormat ) ;
+    }
+}
 
 void InputMethod::sendCommit( const QString& text ) {
     if ( text == "\b" ) {

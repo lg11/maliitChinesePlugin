@@ -1,8 +1,11 @@
 #include "engine.h"
 #include "worker.h"
+#include "keyfilter.h"
 
 #include <QList>
 #include <QString>
+
+//#include <QDebug>
 
 namespace engine {
 
@@ -10,14 +13,17 @@ class EnginePrivate {
 public :
     Worker* worker ;
     int pageLength ;
+    KeyFilter* keyFilter ;
     EnginePrivate() :
         worker( new Worker() ), 
-        pageLength( 5 )
+        pageLength( 5 ) ,
+        keyFilter( new KeyFilter() ) 
     {
         this->worker->setKeyboardLayout( Worker::FullKeyboardLayout ) ;
     }
     ~EnginePrivate() {
         delete this->worker ;
+        delete this->keyFilter ;
     }
 } ;
 
@@ -36,44 +42,43 @@ void Engine::load( const QString& path ) {
     d->worker->load( path ) ; 
 }
 
-void Engine::appendCode( QChar code ) {
+bool Engine::processKeyEvent( QEvent::Type type, Qt::Key keycode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count ) {
     Q_D( Engine ) ;
-    d->worker->appendCode( code ) ; 
-    emit this->updated() ;
-}
+    bool flag = d->keyFilter->filter( type, keycode, modifiers, text, autoRepeat, count ) ;
+    if ( !flag ) {
+        if ( keycode >= Qt::Key_A && keycode <= Qt::Key_Z ) {
+            QChar code = keycode + 'a' - 'A' ;
+            flag = d->worker->appendCode( code ) ;
+        }
+        else if ( keycode == Qt::Key_Backspace ) {
+            if ( d->worker->getCodeLength() > 0 )
+                flag = d->worker->popCode() ;
+            else if ( d->worker->getSelectedWordLength() > 0 )
+                flag = d->worker->deselect() ;
+        }
+        else if ( keycode == Qt::Key_Space ) {
+            flag = d->worker->select( 0 ) ;
+            if ( d->worker->getSelectedWordLength() > 0 ) {
+                if ( !d->worker->updateCandidate( 0 ) ) {
+                    emit this->commit( d->worker->getSelectedWord() ) ;
+                    d->worker->commit() ;
+                }
+            }
+        }
+        else if ( keycode >= Qt::Key_1 && keycode <= Qt::Key_5 ) {
+            flag = d->worker->select( keycode - Qt::Key_1 ) ;
+            if ( d->worker->getSelectedWordLength() > 0 ) {
+                if ( !d->worker->updateCandidate( 0 ) ) {
+                    emit this->commit( d->worker->getSelectedWord() ) ;
+                    d->worker->commit() ;
+                }
+            }
+        }
+        if ( flag ) 
+            emit this->updated() ;
+    }
 
-void Engine::appendCode( const QString& code ) {
-    if ( code.length() > 0 ) 
-        this->appendCode( code[0] ) ;
-}
-
-void Engine::appendCode( int keycode ) {
-    QChar code = keycode + 'a' - 'A' ;
-    this->appendCode( code ) ; 
-}
-
-void Engine::popCode() {
-    Q_D( Engine ) ;
-    d->worker->popCode() ;
-    emit this->updated() ;
-}
-
-void Engine::reset() {
-    Q_D( Engine ) ;
-    d->worker->reset() ;
-    emit this->updated() ;
-}
-
-void Engine::select( int index ) {
-    Q_D( Engine ) ;
-    d->worker->select( index ) ;
-    emit this->updated() ;
-}
-
-void Engine::deselect() {
-    Q_D( Engine ) ;
-    d->worker->deselect() ;
-    emit this->updated() ;
+    return flag || d->worker->getSelectedWordLength() > 0 || d->worker->getCodeLength() > 0 ;
 }
 
 QString Engine::getCandidateString() {

@@ -23,6 +23,19 @@ Item {
             _2 = list[5]
             _3 = list[6]
             _4 = list[7]
+
+            if ( selectedWord.length > 0 ) {
+                if ( invalidCode.length > 0 ) 
+                    inputmethod.sendPreedit( selectedWord.concat( "'", validCode ), "'".concat( invalidCode ) )
+                else
+                    inputmethod.sendPreedit( selectedWord.concat( "'", validCode ), invalidCode )
+            }
+            else {
+                if ( invalidCode.length > 0 ) 
+                    inputmethod.sendPreedit( validCode, "'".concat( invalidCode ) )
+                else
+                    inputmethod.sendPreedit( validCode, invalidCode )
+            }
         }
     }
 }

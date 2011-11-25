@@ -6,7 +6,8 @@ import me.utils.toucharea 1.0
 
 
 Rectangle {
-    FakeInputMethod { id : inputmethod ; anchors.fill : parent }
+    /*FakeInputMethod { id : inputmethod ; anchors.fill : parent }*/
+    /*Engine { id : engine ; objectName : "engine" }*/
     id : canvas
     transformOrigin: Item.Center
     width : inputmethod.screenWidth
@@ -14,9 +15,12 @@ Rectangle {
     color : "transparent"
 
     Style { id : style }
-    Engine { id : engine }
 
-    EditToolBar {}
+    EditToolBar {
+        x: 100
+        y : 100
+        objectName : "edittool"
+    }
 
     RootTouchArea {
         id : root
@@ -29,8 +33,9 @@ Rectangle {
             anchors.bottom : parent.bottom
             width : parent.width
             height : parent.height / 2
-            color : "white"
+            color : "transparent"
             FullKeyboard {
+                visible : false
                 anchors.fill : parent
             }
             /*Toolbar {*/
@@ -58,12 +63,17 @@ Rectangle {
     }
 
     Component.onCompleted : {
-        inputmethod.setInputMethodArea( Qt.rect( panel.x, panel.y, panel.width, panel.height ) )
+        inputmethod.setInputMethodArea( Qt.rect( 0, 0, 1, 1 ) )
+        /*inputmethod.setInputMethodArea( Qt.rect( panel.x, panel.y, panel.width, panel.height ) )*/
         inputmethod.appOrientationChanged.connect( handleAppOrientationChanged )
         /*toolbarData.updated.connect( toolbar.update )*/
         console.log( "load start" )
-        engine.load( "../../data/formated" )
+        engine.load( "/opt/linputmehtod/data/formated" )
         console.log( "load finish" )
+
+        console.log( inputmethod.screenWidth, inputmethod.screenHeight )
+
+        engine.commit.connect( inputmethod.sendCommit )
     }
 
 }

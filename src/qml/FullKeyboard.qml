@@ -5,43 +5,50 @@ Item {
     focus: true
 
     property QtObject keydata : KeyData {}
+    property int keyWidth : width / 10
+    property int keyHeight : height / 5
     Column {
         Row {
-            Key { keycode : Qt.Key_Q }
-            Key { keycode : Qt.Key_W }
-            Key { keycode : Qt.Key_E }
-            Key { keycode : Qt.Key_R }
-            Key { keycode : Qt.Key_T }
-            Key { keycode : Qt.Key_Y }
-            Key { keycode : Qt.Key_U }
-            Key { keycode : Qt.Key_I }
-            Key { keycode : Qt.Key_O }
-            Key { keycode : Qt.Key_P }
+            CharactKey { keycode : Qt.Key_Q }
+            CharactKey { keycode : Qt.Key_W }
+            CharactKey { keycode : Qt.Key_E }
+            CharactKey { keycode : Qt.Key_R }
+            CharactKey { keycode : Qt.Key_T }
+            CharactKey { keycode : Qt.Key_Y }
+            CharactKey { keycode : Qt.Key_U }
+            CharactKey { keycode : Qt.Key_I }
+            CharactKey { keycode : Qt.Key_O }
+            CharactKey { keycode : Qt.Key_P }
         }
         Row {
-            Key { keycode : Qt.Key_A }
-            Key { keycode : Qt.Key_S }
-            Key { keycode : Qt.Key_D }
-            Key { keycode : Qt.Key_F }
-            Key { keycode : Qt.Key_G }
-            Key { keycode : Qt.Key_H }
-            Key { keycode : Qt.Key_J }
-            Key { keycode : Qt.Key_K }
-            Key { keycode : Qt.Key_L }
+            Item { height : 1 ; width : keyWidth * 0.5 }
+            CharactKey { keycode : Qt.Key_A }
+            CharactKey { keycode : Qt.Key_S }
+            CharactKey { keycode : Qt.Key_D }
+            CharactKey { keycode : Qt.Key_F }
+            CharactKey { keycode : Qt.Key_G }
+            CharactKey { keycode : Qt.Key_H }
+            CharactKey { keycode : Qt.Key_J }
+            CharactKey { keycode : Qt.Key_K }
+            CharactKey { keycode : Qt.Key_L }
         }
         Row {
-            Key { keycode : Qt.Key_Z }
-            Key { keycode : Qt.Key_X }
-            Key { keycode : Qt.Key_C }
-            Key { keycode : Qt.Key_V }
-            Key { keycode : Qt.Key_B }
-            Key { keycode : Qt.Key_N }
-            Key { keycode : Qt.Key_M }
-            Key { keycode : Qt.Key_K }
-            Key { keycode : Qt.Key_L }
+            Item { height : 1 ; width : keyWidth * 0.85 }
+            CharactKey { keycode : Qt.Key_Z }
+            CharactKey { keycode : Qt.Key_X }
+            CharactKey { keycode : Qt.Key_C }
+            CharactKey { keycode : Qt.Key_V }
+            CharactKey { keycode : Qt.Key_B }
+            CharactKey { keycode : Qt.Key_N }
+            CharactKey { keycode : Qt.Key_M }
+            FunctionKey { keycode : Qt.Key_Backspace ; width : keyWidth * 2.15 }
         }
         Row {
-            Key { keycode : Qt.Key_S }
+            FunctionKey { keycode : Qt.Key_Shift ; width : keyWidth * 1.75 }
+            FunctionKey { keycode : Qt.Key_Alt ; width : keyWidth * 1.75 }
+            FunctionKey { keycode : Qt.Key_Space ; width : keyWidth * 3 }
+            FunctionKey { keycode : Qt.Key_Alt ; width : keyWidth * 1.75 }
+            FunctionKey { keycode : Qt.Key_Shift ; width : keyWidth * 1.75 }
         }
     }
 
@@ -50,9 +57,11 @@ Item {
     }
 
     function processKeyEvent( keycode, modifiers ) {
-        if ( keycode >= Qt.Key_A && keycode <= Qt.Key_Z ) {
-            engine.appendCode( keycode )
+        var flag = engine.processKeyEvent( keycode )
+        if ( !flag ) {
+            if ( keycode == Qt.Key_Backspace )
+                inputmethod.backspace()
         }
-        return true
+        return flag
     }
 }

@@ -22,5 +22,23 @@ Item {
         /*activeFocusOnPress : false*/
     }
 
+    function sendCommit( text ) {
+        var cursorPosition = textEdit.cursorPosition
+        var head = textEdit.text.slice( 0, cursorPosition )
+        var tail = textEdit.text.slice( cursorPosition, textEdit.text.length )
+        textEdit.text = head.concat( text, tail )
+        textEdit.cursorPosition = cursorPosition + text.length
+    }
+
+    function backspace() {
+        var cursorPosition = textEdit.cursorPosition
+        if ( cursorPosition > 0 ) {
+            var head = textEdit.text.slice( 0, cursorPosition - 1 )
+            var tail = textEdit.text.slice( cursorPosition, textEdit.text.length )
+            textEdit.text = head.concat( tail )
+            textEdit.cursorPosition = cursorPosition - 1
+        }
+    }
+
 }
 
