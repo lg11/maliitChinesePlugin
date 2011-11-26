@@ -50,6 +50,7 @@ KeyFilter::KeyFilter() :
     stickyMask( 0 )
 {
     this->stickyKey |= MASK_SHIFT ;
+    this->stickyKey |= MASK_FN ;
 }
 
 KeyFilter::~KeyFilter() {
@@ -102,6 +103,12 @@ bool KeyFilter::filter( QEvent::Type type, int keycode, Qt::KeyboardModifiers mo
                     flag = this->setMask( MASK_ALT ) ;
                 else if ( type == QEvent::KeyRelease ) 
                     flag = this->unsetMask( MASK_ALT ) ;
+                break ;
+            case Qt::Key_AltGr :
+                if ( type == QEvent::KeyPress ) 
+                    flag = this->setMask( MASK_FN ) ;
+                else if ( type == QEvent::KeyRelease ) 
+                    flag = this->unsetMask( MASK_FN ) ;
                 break ;
             default :
                 if ( type == QEvent::KeyPress ) {

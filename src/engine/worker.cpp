@@ -150,17 +150,19 @@ bool Worker::prevPage( int pageLength ) {
 
 bool Worker::nextPage( int pageLength ) {
     bool flag = false ;
-    int pageStartIndex = this->pageStartIndex + pageLength ;
-    const lookup::Candidate* candidate ;
-    if ( this->keyboardLayout == FullKeyboardLayout )
-        candidate = this->lookup->getCandidate( pageStartIndex ) ;
-    else if ( this->keyboardLayout == T9KeyboardLayout )
-        candidate = this->t9lookup->getCandidate( pageStartIndex ) ;
-    else
-        candidate = NULL ;
-    if ( candidate ) {
-        this->pageStartIndex = pageStartIndex ;
-        flag = true ;
+    if ( this->getCodeLength() > 0 ) {
+        int pageStartIndex = this->pageStartIndex + pageLength ;
+        const lookup::Candidate* candidate ;
+        if ( this->keyboardLayout == FullKeyboardLayout )
+            candidate = this->lookup->getCandidate( pageStartIndex ) ;
+        else if ( this->keyboardLayout == T9KeyboardLayout )
+            candidate = this->t9lookup->getCandidate( pageStartIndex ) ;
+        else
+            candidate = NULL ;
+        if ( candidate ) {
+            this->pageStartIndex = pageStartIndex ;
+            flag = true ;
+        }
     }
     return flag ;
 }

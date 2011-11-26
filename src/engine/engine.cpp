@@ -137,6 +137,8 @@ bool Engine::processKeyEvent( QEvent::Type type, int keycode, Qt::KeyboardModifi
     Q_D( Engine ) ;
 
     bool flag = false ;
+
+    //qDebug() << "processs start" ;
     
     if ( keycode == d->functionKey[SWITCH_ACTIVE] ) {
         if ( !d->working )
@@ -175,7 +177,6 @@ bool Engine::processKeyEvent( QEvent::Type type, int keycode, Qt::KeyboardModifi
         if ( d->worker->getSelectedWordLength() <= 0 && d->worker->getCodeLength() <= 0 )
             this->setWorking( false ) ;
     }
-
 
     return flag || d->working ;
 }

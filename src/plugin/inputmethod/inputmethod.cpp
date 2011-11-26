@@ -228,8 +228,9 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
     int keycode = d->keyFilter->remap( keyCode ) ;
     int stickyMask = d->keyFilter->stickyMask ;
     flag = d->keyFilter->filter( keyType, keycode, modifiers, text, autoRepeat, count ) ;
-    if ( !flag && !modifiers && d->engine ) {
-        if ( !( !d->engine->getWorking() && stickyMask ) )
+    if ( !flag && d->engine ) {
+        flag = d->engine->getWorking() ;
+        if ( !modifiers && !( !d->engine->getWorking() && stickyMask ) )
             flag = d->engine->processKeyEvent( keyType, keycode, modifiers, text, autoRepeat, count ) ;
     }
 
@@ -244,6 +245,10 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
                 switch ( stickyMask ) {
                     case KeyFilter::MASK_SHIFT :
                         punc = d->stickySymbol[InputMethodPrivate::MASK_SHIFT]->remap( (*symbol)[0] ) ; 
+                        break ;
+                    case KeyFilter::MASK_FN :
+                        punc = d->stickySymbol[InputMethodPrivate::MASK_FN]->remap( (*symbol)[0] ) ; 
+                        break ;
                 }
                 if ( punc )
                     symbol = punc ;
@@ -255,6 +260,7 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
                     symbol = punc ;
             }
         }
+
         QKeyEvent event( keyType, keycode, modifiers, *symbol, autoRepeat, count ) ;
         this->inputMethodHost()->sendKeyEvent( event ) ;
     }
