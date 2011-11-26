@@ -19,6 +19,13 @@ namespace inputmethod {
 
 class InputMethodPrivate {
 public :
+    enum KeyMask {
+        MASK_SHIFT ,
+        MASK_CTRL ,
+        MASK_ALT ,
+        MASK_FN ,
+        MASK_META 
+    } ;
     //Q_DECLARE_PUBLIC( InputMethod ) ;
     InputMethodView* const view ;
     QRect inputMethodArea ;
@@ -28,6 +35,8 @@ public :
     engine::Engine* engine ;
     KeyFilter* keyFilter ;
     SymbolMap* symbolMap ;
+    SymbolMap* stickySymbol[5] ;
+    QHash<QString, int> stickyHash ;
     SymbolMap* puncMap ;
     //toolbar::Data* toolbarData ;
     QString debugString ;
@@ -41,6 +50,7 @@ public :
         engine( new engine::Engine() ) ,
         keyFilter( new KeyFilter() ) ,
         symbolMap( new SymbolMap() ) ,
+        stickyHash() ,
         puncMap( new SymbolMap() ) ,
         //toolbarData( new toolbar::Data() ) ,
         debugString()
@@ -64,6 +74,18 @@ public :
         this->preeditFormat.append( MInputMethod::PreeditTextFormat( 0, 0, MInputMethod::PreeditDefault ) ) ;
         this->preeditFormat.append( MInputMethod::PreeditTextFormat( 0, 0, MInputMethod::PreeditNoCandidates ) ) ;
         //this->engine->rootContext()->setContextProperty( "toolbarData", this->toolbarData ) ;
+        
+        this->stickySymbol[MASK_SHIFT] = new SymbolMap() ;
+        this->stickySymbol[MASK_CTRL] = new SymbolMap() ;
+        this->stickySymbol[MASK_ALT] = new SymbolMap() ;
+        this->stickySymbol[MASK_FN] = new SymbolMap() ;
+        this->stickySymbol[MASK_META] = new SymbolMap() ;
+
+        this->stickyHash.insert( "MASK_SHIFT", MASK_SHIFT ) ;
+        this->stickyHash.insert( "MASK_CTRL", MASK_CTRL ) ;
+        this->stickyHash.insert( "MASK_ALT", MASK_ALT ) ;
+        this->stickyHash.insert( "MASK_FN", MASK_FN ) ;
+        this->stickyHash.insert( "MASK_META", MASK_META ) ;
     }
 
     ~InputMethodPrivate() {
@@ -71,6 +93,11 @@ public :
         delete this->engine ;
         delete this->keyFilter ;
         delete this->symbolMap ;
+        delete this->stickySymbol[MASK_SHIFT] ;
+        delete this->stickySymbol[MASK_CTRL] ;
+        delete this->stickySymbol[MASK_ALT] ;
+        delete this->stickySymbol[MASK_FN] ;
+        delete this->stickySymbol[MASK_META] ;
         delete this->puncMap ;
         //delete this->toolbarData ;
     }
@@ -199,9 +226,11 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
     bool flag ;
 
     int keycode = d->keyFilter->remap( keyCode ) ;
+    int stickyMask = d->keyFilter->stickyMask ;
     flag = d->keyFilter->filter( keyType, keycode, modifiers, text, autoRepeat, count ) ;
     if ( !flag && !modifiers && d->engine ) {
-        flag = d->engine->processKeyEvent( keyType, keycode, modifiers, text, autoRepeat, count ) ;
+        if ( !( !d->engine->getWorking() && stickyMask ) )
+            flag = d->engine->processKeyEvent( keyType, keycode, modifiers, text, autoRepeat, count ) ;
     }
 
     if ( !flag ) {
@@ -210,6 +239,15 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
             symbol = d->symbolMap->remap( text[0] ) ; 
             if ( !symbol )
                 symbol = &text ;
+            if ( !modifiers ) {
+                const QString* punc = 0 ;
+                switch ( stickyMask ) {
+                    case KeyFilter::MASK_SHIFT :
+                        punc = d->stickySymbol[InputMethodPrivate::MASK_SHIFT]->remap( (*symbol)[0] ) ; 
+                }
+                if ( punc )
+                    symbol = punc ;
+            }
             if ( d->engine->getActive() ) {
                 const QString* punc = 0 ;
                 punc = d->puncMap->remap( (*symbol)[0] ) ; 
@@ -320,6 +358,22 @@ void InputMethod::remapSymbol( const QString& src, const QString& dest ) {
 void InputMethod::unramapSymbol( const QString& src ) {
     Q_D( InputMethod ) ;
     d->symbolMap->unsetRemap( src[0] ) ;
+}
+
+void InputMethod::remapStickySymbol( const QString& mask, const QString& src, const QString& dest ) {
+    Q_D( InputMethod ) ;
+    if ( d->stickyHash.contains( mask ) ) {
+        int index = d->stickyHash.value( mask ) ;
+        d->stickySymbol[index]->setRemap( src[0], dest ) ;
+    }
+}
+
+void InputMethod::unremapStickySymbol( const QString& mask, const QString& src ) {
+    Q_D( InputMethod ) ;
+    if ( d->stickyHash.contains( mask ) ) {
+        int index = d->stickyHash.value( mask ) ;
+        d->stickySymbol[index]->unsetRemap( src[0] ) ;
+    }
 }
 
 void InputMethod::remapPunc( const QString& src, const QString& dest ) {

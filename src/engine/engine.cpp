@@ -56,7 +56,7 @@ public :
         this->functionKey[CANDIDATE_5] = Qt::Key_5 ;
         this->functionKey[NEXT_PAGE] = Qt::Key_BracketRight ;
         this->functionKey[PREV_PAGE] = Qt::Key_BracketLeft ;
-        this->functionKey[SWITCH_ACTIVE] = Qt::Key_Shift ;
+        this->functionKey[SWITCH_ACTIVE] = Qt::Key_Control ;
         this->functionKey[BACKSPACE] = Qt::Key_Backspace ;
 
         this->worker->setKeyboardLayout( Worker::FullKeyboardLayout ) ;

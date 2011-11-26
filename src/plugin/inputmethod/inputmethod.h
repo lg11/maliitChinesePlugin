@@ -64,6 +64,8 @@ public slots:
     void unrampKey( int src ) ;
     void remapSymbol( const QString& src, const QString& dest ) ;
     void unramapSymbol( const QString& src ) ;
+    void remapStickySymbol( const QString& mask, const QString& src, const QString& dest ) ;
+    void unremapStickySymbol( const QString& mask, const QString& src ) ;
     void remapPunc( const QString& src, const QString& dest ) ;
     void unramapPunc( const QString& src ) ;
 
