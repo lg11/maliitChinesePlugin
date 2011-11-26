@@ -14,7 +14,8 @@ Item {
             anchors.verticalCenterOffset : 10
             width : 20
             height : 20
-            color : "gray"
+            color : engine.active ? "gray" : "black"
+            /*color : "gray"*/
             rotation : 45
         }
     }

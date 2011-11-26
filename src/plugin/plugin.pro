@@ -2,15 +2,20 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-#CONFIG += meegoimframework
-#CONFIG += meegotouch
-#CONFIG += meegoimquick
-
-CONFIG += link_pkgconfig
-PKGCONFIG += maliit-plugins-0.80
-target.path += $$system(pkg-config --variable pluginsdir maliit-plugins-0.80)
-INCLUDEPATH += $$system(pkg-config --cflags maliit-plugins-0.80 | tr \' \' \'\\n\' | grep ^-I | cut -d I -f 2-)
-INSTALLS += target
+unix {
+    maemo6 {
+        CONFIG += meegoimframework
+        CONFIG += meegotouch
+        CONFIG += meegoimquick
+    }
+    else {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += maliit-plugins-0.80
+        target.path += $$system(pkg-config --variable pluginsdir maliit-plugins-0.80)
+        INCLUDEPATH += $$system(pkg-config --cflags maliit-plugins-0.80 | tr \' \' \'\\n\' | grep ^-I | cut -d I -f 2-)
+        INSTALLS += target
+    }
+}
 
 
 QT = core gui declarative

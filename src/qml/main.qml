@@ -68,12 +68,12 @@ Rectangle {
         inputmethod.appOrientationChanged.connect( handleAppOrientationChanged )
         /*toolbarData.updated.connect( toolbar.update )*/
         console.log( "load start" )
-        engine.load( "/opt/linputmehtod/data/formated" )
+        engine.load( "/opt/linputmethod/data/formated" )
         console.log( "load finish" )
 
         /*inputmethod.remapKey( Qt.Key_A, Qt.Key_Z )*/
-        inputmethod.remapSymbol( ",", "." )
-        inputmethod.remapPunc( ".", "，" )
+        inputmethod.remapPunc( ",", "，" )
+        inputmethod.remapPunc( ".", "。" )
 
         console.log( inputmethod.screenWidth, inputmethod.screenHeight )
 

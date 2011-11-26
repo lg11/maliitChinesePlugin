@@ -86,7 +86,7 @@ InputMethod::InputMethod( MAbstractInputMethodHost *host, QWidget *mainWindow ) 
     Q_D( InputMethod ) ;
     d->view->setInputMethod( this ) ;
     d->view->setEngine( d->engine ) ;
-    d->view->load( "/opt/linputmehtod/qml/main.qml" ) ;
+    d->view->load( "/opt/linputmethod/qml/main.qml" ) ;
     //qDebug() << d->engine ;
 
     QWidget* viewport = d->view->viewport() ;
@@ -190,7 +190,7 @@ void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
 }
 
 void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count, quint32 nativeScanCode, quint32 nativeModifiers, unsigned long time) {
-    qDebug() << "inputmethod" << "processKeyEvent" << keyCode << text ;
+    qDebug() << "inputmethod" << "processKeyEvent" << keyCode << text << modifiers ;
     Q_D( InputMethod ) ;
     Q_UNUSED( nativeScanCode )
     Q_UNUSED( nativeModifiers )
@@ -200,22 +200,24 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
 
     int keycode = d->keyFilter->remap( keyCode ) ;
     flag = d->keyFilter->filter( keyType, keycode, modifiers, text, autoRepeat, count ) ;
-    if ( !flag && d->engine ) {
+    if ( !flag && !modifiers && d->engine ) {
         flag = d->engine->processKeyEvent( keyType, keycode, modifiers, text, autoRepeat, count ) ;
     }
 
     if ( !flag ) {
-        const QString* symbol = 0 ;
-        if ( !text.isEmpty() ) 
+        const QString* symbol = &text ;
+        if ( !text.isEmpty() ) {
             symbol = d->symbolMap->remap( text[0] ) ; 
-        if ( !symbol )
-            symbol = &text ;
-        const QString* punc = 0 ;
-        if ( !symbol->isEmpty() ) 
-            punc = d->puncMap->remap( (*symbol)[0] ) ; 
-        if ( !punc )
-            punc = symbol ;
-        QKeyEvent event( keyType, keycode, modifiers, *punc, autoRepeat, count ) ;
+            if ( !symbol )
+                symbol = &text ;
+            if ( d->engine->getActive() ) {
+                const QString* punc = 0 ;
+                punc = d->puncMap->remap( (*symbol)[0] ) ; 
+                if ( punc )
+                    symbol = punc ;
+            }
+        }
+        QKeyEvent event( keyType, keycode, modifiers, *symbol, autoRepeat, count ) ;
         this->inputMethodHost()->sendKeyEvent( event ) ;
     }
 }
