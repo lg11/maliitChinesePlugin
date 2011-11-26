@@ -26,7 +26,8 @@ HEADERS += \
 	plugin.h \
 	./engine/engine.h \
 	./engine/worker.h \
-	./engine/keyfilter.h \
+	./inputmethod/keyfilter.h \
+	./inputmethod/symbolmap.h \
 	./inputmethod/inputmethod.h \
     ./view/inputmethodview.h \
 
@@ -37,7 +38,6 @@ SOURCES += \
 	plugin.cpp \
 	./engine/engine.cpp \
 	./engine/worker.cpp \
-	./engine/keyfilter.cpp \
 	./inputmethod/inputmethod.cpp \
     ./view/inputmethodview.cpp \
 

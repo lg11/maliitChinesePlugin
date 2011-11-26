@@ -21,7 +21,7 @@ public :
 
 public slots :
     void load( const QString& path ) ;
-    bool processKeyEvent( QEvent::Type type, Qt::Key keycode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count ) ;
+    bool processKeyEvent( QEvent::Type type, int keycode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count ) ;
     QString getCandidateString() ;
 private :
     Q_DISABLE_COPY( Engine ) ;

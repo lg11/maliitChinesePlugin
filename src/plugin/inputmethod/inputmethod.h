@@ -60,6 +60,13 @@ public :
     const QString& debugString() const ;
 
 public slots:
+    void remapKey( int src, int dest ) ;
+    void unrampKey( int src ) ;
+    void remapSymbol( const QString& src, const QString& dest ) ;
+    void unramapSymbol( const QString& src ) ;
+    void remapPunc( const QString& src, const QString& dest ) ;
+    void unramapPunc( const QString& src ) ;
+
     void setScreenRegion( const QRect &area ) ;
     void setInputMethodArea( const QRect &area ) ;
     void sendPreedit( const QString& black, const QString& red ) ;

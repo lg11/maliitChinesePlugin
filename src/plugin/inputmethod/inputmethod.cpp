@@ -1,6 +1,8 @@
 #include "inputmethod.h"
 #include "inputmethodview.h"
 #include "engine.h"
+#include "keyfilter.h"
+#include "symbolmap.h"
 
 #include <QRect>
 #include <QRegion>
@@ -24,6 +26,9 @@ public :
     QRect cursorRect ;
     QList<MInputMethod::PreeditTextFormat> preeditFormat ;
     engine::Engine* engine ;
+    KeyFilter* keyFilter ;
+    SymbolMap* symbolMap ;
+    SymbolMap* puncMap ;
     //toolbar::Data* toolbarData ;
     QString debugString ;
     
@@ -33,7 +38,10 @@ public :
         appOrientation( 0 ) ,
         cursorRect() ,
         preeditFormat() ,
-        engine( new engine::Engine ) ,
+        engine( new engine::Engine() ) ,
+        keyFilter( new KeyFilter() ) ,
+        symbolMap( new SymbolMap() ) ,
+        puncMap( new SymbolMap() ) ,
         //toolbarData( new toolbar::Data() ) ,
         debugString()
     {
@@ -60,6 +68,10 @@ public :
 
     ~InputMethodPrivate() {
         delete this->view ;
+        delete this->engine ;
+        delete this->keyFilter ;
+        delete this->symbolMap ;
+        delete this->puncMap ;
         //delete this->toolbarData ;
     }
 } ;
@@ -178,18 +190,32 @@ void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
 }
 
 void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count, quint32 nativeScanCode, quint32 nativeModifiers, unsigned long time) {
-    qDebug() << "inputmethod" << "processKeyEvent" << keyCode ;
+    qDebug() << "inputmethod" << "processKeyEvent" << keyCode << text ;
     Q_D( InputMethod ) ;
     Q_UNUSED( nativeScanCode )
     Q_UNUSED( nativeModifiers )
     Q_UNUSED( time )
 
-    bool flag = false ;
-    if ( d->engine ) {
-        flag = d->engine->processKeyEvent( keyType, keyCode, modifiers, text, autoRepeat, count ) ;
+    bool flag ;
+
+    int keycode = d->keyFilter->remap( keyCode ) ;
+    flag = d->keyFilter->filter( keyType, keycode, modifiers, text, autoRepeat, count ) ;
+    if ( !flag && d->engine ) {
+        flag = d->engine->processKeyEvent( keyType, keycode, modifiers, text, autoRepeat, count ) ;
     }
+
     if ( !flag ) {
-        QKeyEvent event( keyType, keyCode, modifiers, text, autoRepeat, count ) ;
+        const QString* symbol = 0 ;
+        if ( !text.isEmpty() ) 
+            symbol = d->symbolMap->remap( text[0] ) ; 
+        if ( !symbol )
+            symbol = &text ;
+        const QString* punc = 0 ;
+        if ( !symbol->isEmpty() ) 
+            punc = d->puncMap->remap( (*symbol)[0] ) ; 
+        if ( !punc )
+            punc = symbol ;
+        QKeyEvent event( keyType, keycode, modifiers, *punc, autoRepeat, count ) ;
         this->inputMethodHost()->sendKeyEvent( event ) ;
     }
 }
@@ -273,6 +299,37 @@ const QString& InputMethod::debugString() const {
     Q_D( const InputMethod ) ;
     return d->debugString ;
 }
+
+void InputMethod::remapKey( int src, int dest ) {
+    Q_D( InputMethod ) ;
+    d->keyFilter->setRemap( src, dest ) ;
+}
+
+void InputMethod::unrampKey( int src ) {
+    Q_D( InputMethod ) ;
+    d->keyFilter->unsetRemap( src ) ;
+}
+
+void InputMethod::remapSymbol( const QString& src, const QString& dest ) {
+    Q_D( InputMethod ) ;
+    d->symbolMap->setRemap( src[0], dest ) ;
+}
+
+void InputMethod::unramapSymbol( const QString& src ) {
+    Q_D( InputMethod ) ;
+    d->symbolMap->unsetRemap( src[0] ) ;
+}
+
+void InputMethod::remapPunc( const QString& src, const QString& dest ) {
+    Q_D( InputMethod ) ;
+    d->puncMap->setRemap( src[0], dest ) ;
+}
+
+void InputMethod::unramapPunc( const QString& src ) {
+    Q_D( InputMethod ) ;
+    d->puncMap->unsetRemap( src[0] ) ;
+}
+
 
 void InputMethod::setScreenRegion( const QRect &area ) {
     QRegion region( area ) ;

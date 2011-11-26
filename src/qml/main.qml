@@ -71,6 +71,10 @@ Rectangle {
         engine.load( "/opt/linputmehtod/data/formated" )
         console.log( "load finish" )
 
+        /*inputmethod.remapKey( Qt.Key_A, Qt.Key_Z )*/
+        inputmethod.remapSymbol( ",", "." )
+        inputmethod.remapPunc( ".", "，" )
+
         console.log( inputmethod.screenWidth, inputmethod.screenHeight )
 
         engine.commit.connect( inputmethod.sendCommit )
