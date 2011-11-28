@@ -7,9 +7,14 @@
 #include <QPair>
 #include <QSet>
 
+//#include <QDebug>
+
 namespace split {
 
 typedef QPair< QSet<QString>, QPair< QSet<QChar>, QSet<QString> > > KeySet ;
+// KeySet.first : full key string, ie (pinyin) : long -> long
+// KeySet.second.first : first char of key, ie (pinyin) : l -> long
+// KeySet.second.first : incompleted key, ie (pinyin) : lon -> long
 
 inline void add_key( KeySet* set, const QString& key ) {
     if ( !set->first.contains( key ) ) {
@@ -31,15 +36,19 @@ inline bool check_head( const KeySet* set, QChar head ) { return set->second.fir
 inline bool check_valid( const KeySet* set, const QString& key ) { return set->first.contains( key ) ? true : set->second.second.contains( key ) ; } 
 
 typedef QPair< QStringList, QPair<int,int> > KeyString ;
+// KeyString.first : stringList of key, ie (pinyin) : san'ge'ri
+// KeyString.second.first : string length, ie (pinyin) : 7 -> san'ge'ri
+// KeyString.second.second : string splited start length
+typedef QList<KeyString> KeyList ;
 
-inline void append_code( KeyString* string, QChar code, const KeySet* keySet, QList<KeyString>* stringList ) {
+inline void append_code( KeyList* list, QChar code, const KeySet* set, KeyString* string ) {
     QString* tail = &(string->first.last()) ;
-    bool flag = check_complete( keySet, *tail ) && check_head( keySet, code ) ;
+    bool flag = check_complete( set, *tail ) && check_head( set, code ) ;
     tail->append( code ) ;
-    if ( check_valid( keySet, *tail ) ) {
+    if ( check_valid( set, *tail ) ) {
         if ( flag ) {
-            stringList->append( *string ) ;
-            KeyString* new_string = &(stringList->last()) ;
+            list->append( *string ) ;
+            KeyString* new_string = &(list->last()) ;
             new_string->first.last().chop( 1 ) ;
             new_string->first.append( code ) ;
             new_string->second.first++ ;
@@ -49,7 +58,7 @@ inline void append_code( KeyString* string, QChar code, const KeySet* keySet, QL
     }
     else {
         tail->chop( 1 ) ;
-        if ( check_head( keySet, code ) ) {
+        if ( check_head( set, code ) ) {
             string->first.append( code ) ;
             string->second.first++ ;
         }
@@ -66,48 +75,41 @@ inline void pop_code( KeyString* string ) {
     }
 }
 
-class Spliter {
-public :
-    QString code ;
-    KeyString emptyString ;
-    KeySet keySet ;
-    QList<KeyString> stringList ;
-    inline Spliter() : code(), emptyString( QStringList(), QPair<int,int>() ), keySet(), stringList() {
-        this->emptyString.first.append( QString("") ) ;
-        this->stringList.append( this->emptyString ) ;
+inline void append_code( KeyList* list, QChar code, const KeySet* set, int code_length ) {
+    QList<KeyString*> buffer ;
+    for ( int i = 0, l = list->length() ; i < l ; i++ )
+        buffer.append( &((*list)[i]) ) ;
+    for ( int i = 0, l = buffer.length() ; i < l ; i++ ) {
+        KeyString* string = buffer[i] ;
+        if ( string->second.first >= code_length ) 
+            append_code( list, code, set, string ) ;
     }
-    inline void appendCode( QChar code ) {
-        QList<KeyString*> list ;
-        for ( int i = 0 ; i < this->stringList.length() ; i++ )
-            list.append( &(this->stringList[i]) ) ;
-        for ( int i = 0 ; i < list.length() ; i++ ) {
-            KeyString* string = list[i] ;
-            if ( string->second.first >= this->code.length() ) 
-                append_code( string, code, &(this->keySet), &(this->stringList) ) ;
+}
+
+inline void pop_code( KeyList* list, int code_length ) {
+    QList<int> buffer ;
+    for ( int i = 0, l = list->length() ; i < l ; i++ ) {
+        KeyString* string = &((*list)[i]) ;
+        if ( string->second.first > code_length ) {
+            pop_code( string ) ;
+            if ( string->second.first <= string->second.second )
+                buffer.append( i ) ;
         }
-        this->code.append( code ) ;
     }
-    inline void popCode() {
-        this->code.chop( 1 ) ;
-        QList<int> removeList ;
-        for ( int i = 0 ; i < this->stringList.length() ; i++ ) {
-            KeyString* string = &(this->stringList[i]) ;
-            if ( string->second.first > this->code.length() ) {
-                pop_code( string ) ;
-                if ( string->second.first <= string->second.second )
-                    removeList.append( i ) ;
-            }
-        }
-        int removedCount = 0 ;
-        foreach ( int i, removeList ) {
-            this->stringList.removeAt( i - removedCount ) ;
-            removedCount++ ;
-        }
-        if ( this->stringList.isEmpty() ) 
-            this->stringList.append( this->emptyString ) ;
+    int count = 0 ;
+    for ( int i = 0, l = buffer.length() ; i < l ; i++ ) {
+        int index = buffer.at(i) ;
+        list->removeAt( index - count ) ;
+        count++ ;
     }
-    inline void clearCode() { this->code.clear() ; this->stringList.clear() ; this->stringList.append( this->emptyString ) ; }
-} ;
+    if ( list->isEmpty() ) 
+        list->append( KeyString( QStringList( QString() ), QPair<int, int>() ) ) ;
+}
+
+inline void clear_code( KeyList* list ) {
+    list->clear() ;
+    list->append( KeyString( QStringList( QString() ), QPair<int, int>() ) ) ;
+}
 
 }
 

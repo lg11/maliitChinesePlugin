@@ -67,7 +67,7 @@ int main( int argc, char** argv ) {
     qDebug() << "loaded" ;
     foreach ( const QString& key, lup.dict.hash.keys() ) {
         if ( key.count( '\'' ) <= 0 )
-            split::add_key( &(lup.spliter.keySet), key ) ;
+            split::add_key( &(lup.keySet), key ) ;
         fit::add_key( &(lup.keyMap), key ) ;
         t9lup.tree.addKey( key ) ;
     }
@@ -99,7 +99,7 @@ int main( int argc, char** argv ) {
             //lup.appendCode( s[i] ) ;
         lup.setCode( s ) ;
         for ( int i = 0 ; i < 10 ; i ++ ) {
-            const lookup::Candidate* cand = lup.getCand( i ) ;
+            const lookup::Candidate* cand = lup.getCandidate( i ) ;
             if ( cand )
                 qDebug() << *cand ;
         }

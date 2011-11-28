@@ -43,8 +43,10 @@ typedef QPair< int, QPair< QList<const QString*>, QList<const QString*> > > Look
 
 class Lookup {
 public :
+    QString code ;
     dict::Dictionary dict ;
-    split::Spliter spliter ;
+    split::KeySet keySet ;
+    split::KeyList keyList ;
     fit::KeyMap keyMap ;
     QList<pick::PickPair> pickCache ;
     QList<LookupPair> lookupCache ;
@@ -55,23 +57,27 @@ public :
     QList<Candidate> candList ;
     int candLength ;
 
-    inline Lookup() : dict(), spliter(), keyMap(), pickCache(), lookupCache(), preeditCache(), usedKeySet(), candCacheIndex(0), candStartIndex(0), candList(), candLength(0) {}
+    inline Lookup() : code(), dict(), keySet(), keyList(), keyMap(), pickCache(), lookupCache(), preeditCache(), usedKeySet(), candCacheIndex(0), candStartIndex(0), candList(), candLength(0) {
+        this->keyList.append( split::KeyString( QStringList( QString() ), QPair<int, int>() ) ) ;
+    }
 
     inline void appendCode( QChar code ) {
         this->pickCache.clear() ;
         this->usedKeySet.clear() ;
-        this->spliter.appendCode( code ) ;
         this->lookupCache.append( LookupPair() ) ;
         this->preeditCache.append( QList<QString>() ) ;
+
+        split::append_code( &(this->keyList), code, &(this->keySet), this->code.length() ) ;
+        this->code.append( code ) ;
 
         QList<const QString*>* key = &(this->lookupCache.last().second.first)  ;
         QList<const QString*>* preedit = &(this->lookupCache.last().second.second)  ;
         QList<QString>* preeditCache = &(this->preeditCache.last())  ;
         
         int highestPoint = -0x1000 ;
-        for ( int i = 0 ; i < spliter.stringList.length() ; i++ ) {
-            const split::KeyString* string = &(this->spliter.stringList[i]) ;
-            if ( string->second.first == this->spliter.code.length() ) {
+        for ( int i = 0, l = this->keyList.length() ; i < l ; i++ ) {
+            const split::KeyString* string = &(this->keyList[i]) ;
+            if ( string->second.first == this->code.length() ) {
                 int fitPoint ;
                 QList<const QString*> buffer ;
                 fit::fit( &(string->first), &buffer, &fitPoint, &(this->keyMap) ) ;
@@ -110,9 +116,11 @@ public :
     inline void popCode() {
         this->pickCache.clear() ;
         this->usedKeySet.clear() ;
-        this->spliter.popCode() ;
         this->lookupCache.removeLast() ;
         this->preeditCache.removeLast() ;
+
+        this->code.chop( 1 ) ;
+        split::pop_code( &(this->keyList), this->code.length() ) ;
 
         if ( !this->lookupCache.isEmpty() ) {
             QList<const QString*>* key = &(this->lookupCache.last().second.first)  ;
@@ -128,9 +136,10 @@ public :
     }
 
     inline void clearCode() {
+        this->code.clear() ;
         this->pickCache.clear() ;
         this->usedKeySet.clear() ;
-        this->spliter.clearCode() ;
+        split::clear_code( &this->keyList ) ;
         this->lookupCache.clear() ;
         this->preeditCache.clear() ;
         this->candCacheIndex = 0 ;
@@ -183,7 +192,7 @@ public :
     }
 
     inline const Candidate* getCandidate( int index ) {
-        //bool flag = !this->spliter.code.isEmpty() ;
+        //bool flag = !this->code.isEmpty() ;
         bool flag = true ;
         while ( flag && this->candLength <= index ) {
             const QString* key ; const QString* preedit ; const QString* word ; qreal freq ;

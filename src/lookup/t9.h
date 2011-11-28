@@ -31,6 +31,7 @@ inline void check_cand( QList<Candidate>* cand_list, int length ) {
     if ( length >= cand_list->length() ) 
         cand_list->append( Candidate( CandPair( KeyPair( NULL, NULL ), WordPair( NULL, 0 ) ), 0 ) ) ;
 }
+
 inline void set_cand( Candidate* cand, const QString* key, const QString* preedit, const QString* word, qreal freq, int start_index ) {
     cand->first.first.first = key ;
     cand->first.first.second = preedit ;
