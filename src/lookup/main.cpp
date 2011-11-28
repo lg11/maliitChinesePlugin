@@ -1,4 +1,4 @@
-#include "lookup.h"
+#include "pinyin.h"
 #include "t9.h"
 
 #include <QDebug>
@@ -61,18 +61,22 @@ void load( dict::Dictionary* d, QString file_path ) {
 
 
 int main( int argc, char** argv ) {
-    lookup::Lookup lup ;
-    t9::T9Lookup t9lup( &(lup.dict) ) ;
-    load( &(lup.dict), argv[argc-1] ) ;
+    dict::Dictionary dict ;
+    lookup::PinyinLookup pylup( &dict ) ;
+    lookup::T9Lookup t9lup( &dict ) ;
+    load( &dict, argv[argc-1] ) ;
     qDebug() << "loaded" ;
-    foreach ( const QString& key, lup.dict.hash.keys() ) {
+    foreach ( const QString& key, dict.hash.keys() ) {
         if ( key.count( '\'' ) <= 0 )
-            split::add_key( &(lup.keySet), key ) ;
-        fit::add_key( &(lup.keyMap), key ) ;
+            split::add_key( &(pylup.keySet), key ) ;
+        fit::add_key( &(pylup.keyMap), key ) ;
         t9lup.tree.addKey( key ) ;
     }
     qDebug() << "built" ;
 
+    lookup::Lookup* lup ;
+    //lup = &(pylup) ;
+    lup = &(t9lup) ;
     while( 1 ) {
         QTextStream cin( stdin, QIODevice::ReadOnly ) ;
         QString s ;
@@ -97,9 +101,9 @@ int main( int argc, char** argv ) {
 
         //for ( int i = 0 ; i < s.length() ; i++ ) 
             //lup.appendCode( s[i] ) ;
-        lup.setCode( s ) ;
+        lup->setCode( s ) ;
         for ( int i = 0 ; i < 10 ; i ++ ) {
-            const lookup::Candidate* cand = lup.getCandidate( i ) ;
+            const lookup::Candidate* cand = lup->getCandidate( i ) ;
             if ( cand )
                 qDebug() << *cand ;
         }
