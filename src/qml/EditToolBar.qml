@@ -14,13 +14,13 @@ Item {
             anchors.verticalCenterOffset : 10
             width : 20
             height : 20
-            color : engine.active ? "gray" : "black"
+            color : engine.active ? "cornflowerblue" : "gray"
             /*color : "gray"*/
             rotation : 45
         }
     }
     Column {
-        y : mark.y + mark.height
+        y : mark.y + mark.height + 1
         x : mark.x
         spacing : 1
         /*Rectangle {*/
@@ -48,7 +48,7 @@ Item {
         target : inputmethod
         onCursorRectChanged : {
             x = cursorRect.x
-            y = cursorRect.y + cursorRect.height
+            y = cursorRect.y + cursorRect.height + 1
         }
     }
 }

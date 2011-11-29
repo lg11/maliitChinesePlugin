@@ -16,11 +16,7 @@ Rectangle {
 
     Style { id : style }
 
-    EditToolBar {
-        x: 100
-        y : 100
-        objectName : "edittool"
-    }
+    EditToolBar {}
 
     RootTouchArea {
         id : root
@@ -148,13 +144,13 @@ Rectangle {
         engine.remapPunc( "'", "‘" )
         engine.remapPunc( "\"", "“" )
 
-        engine.setFunctionKey( "CANDIDATE_1", Qt.Key_Space )
-        engine.setFunctionKey( "CANDIDATE_2", Qt.Key_Question )
-        engine.setFunctionKey( "CANDIDATE_3", Qt.Key_Left )
-        engine.setFunctionKey( "CANDIDATE_4", Qt.Key_Down )
-        engine.setFunctionKey( "CANDIDATE_5", Qt.Key_Right )
-        engine.setFunctionKey( "NEXT_PAGE", Qt.Key_Period )
-        engine.setFunctionKey( "PREV_PAGE", Qt.Key_Comma )
+        /*engine.setFunctionKey( "CANDIDATE_1", Qt.Key_Space )*/
+        /*engine.setFunctionKey( "CANDIDATE_2", Qt.Key_Question )*/
+        /*engine.setFunctionKey( "CANDIDATE_3", Qt.Key_Left )*/
+        /*engine.setFunctionKey( "CANDIDATE_4", Qt.Key_Down )*/
+        /*engine.setFunctionKey( "CANDIDATE_5", Qt.Key_Right )*/
+        /*engine.setFunctionKey( "NEXT_PAGE", Qt.Key_Period )*/
+        /*engine.setFunctionKey( "PREV_PAGE", Qt.Key_Comma )*/
 
         console.log( inputmethod.screenWidth, inputmethod.screenHeight )
 

@@ -6,7 +6,7 @@
 #include <QString>
 #include <QHash>
 
-#include <QDebug>
+//#include <QDebug>
 
 namespace engine {
 
@@ -21,6 +21,7 @@ enum FunctionKey {
     PREV_PAGE ,
     SWITCH_ACTIVE ,
     BACKSPACE ,
+    CANDIDATE_RETURN
 } ;
 
 class EnginePrivate {
@@ -40,7 +41,7 @@ public :
         puncMap( new PuncMap() ) ,
         hash()
     {
-        qDebug() << "init engine" ;
+        //qDebug() << "init engine" ;
         this->hash.insert( "CANDIDATE_SPACE", CANDIDATE_SPACE ) ;
         this->hash.insert( "CANDIDATE_1", CANDIDATE_1 ) ;
         this->hash.insert( "CANDIDATE_2", CANDIDATE_2 ) ;
@@ -51,6 +52,7 @@ public :
         this->hash.insert( "PREV_PAGE", PREV_PAGE ) ;
         this->hash.insert( "SWITCH_ACTIVE", SWITCH_ACTIVE ) ;
         this->hash.insert( "BACKSPACE", BACKSPACE ) ;
+        this->hash.insert( "CANDIDATE_RETURN", CANDIDATE_RETURN ) ;
 
         this->functionKey[CANDIDATE_SPACE] = Qt::Key_Space ;
         this->functionKey[CANDIDATE_1] = Qt::Key_1 ;
@@ -62,6 +64,7 @@ public :
         this->functionKey[PREV_PAGE] = Qt::Key_BracketLeft ;
         this->functionKey[SWITCH_ACTIVE] = Qt::Key_Control ;
         this->functionKey[BACKSPACE] = Qt::Key_Backspace ;
+        this->functionKey[CANDIDATE_RETURN] = Qt::Key_Return ;
 
         this->worker->setKeyboardLayout( Worker::FullKeyboardLayout ) ;
     }
@@ -175,6 +178,13 @@ bool Engine::processKeyEvent( QEvent::Type type, int keycode, Qt::KeyboardModifi
             flag = d->worker->nextPage( d->pageLength ) ;
         else if ( keycode == d->functionKey[PREV_PAGE] ) 
             flag = d->worker->prevPage( d->pageLength ) ;
+        else if ( keycode == d->functionKey[CANDIDATE_RETURN] ) {
+            if ( d->worker->getCodeLength() > 0 ) {
+                flag = true ;
+                emit this->commit( d->worker->getCode() ) ;
+                d->worker->reset() ;
+            }
+        }
     }
 
     if ( flag ) {
