@@ -3,9 +3,9 @@
 #include "plugin.h"
 #include "inputmethod.h"
 #include "engine.h"
-//#include "toolbar/data.h"
-//#include "toolbar/item.h"
-//#include "toolbar/icon.h"
+#include "toolbardata.h"
+#include "toolbaritem.h"
+#include "toolbaricon.h"
 //#include "settings.h"
 
 namespace plugin {
@@ -32,9 +32,9 @@ public :
 Plugin::Plugin() : d_ptr( new PluginPrivate ) {
     qmlRegisterUncreatableType<inputmethod::InputMethod> ( "me.inputmethod", 1, 0, "InputMethod", "inputmethod" ) ;
     qmlRegisterUncreatableType<engine::Engine> ( "me.inputmethod", 1, 0, "Engine", "engine" ) ;
-    //qmlRegisterType<toolbar::Data> ( "me.inputmethod.toolbar", 1, 0, "ToolbarData" ) ;
-    //qmlRegisterType<toolbar::Item> ( "me.inputmethod.toolbar", 1, 0, "ToolbarItem" ) ;
-    //qmlRegisterType<toolbar::Icon> ( "me.inputmethod.toolbar", 1, 0, "ToolbarIcon" ) ;
+    qmlRegisterType<toolbar::ToolbarData> ( "me.inputmethod.toolbar", 1, 0, "ToolbarData" ) ;
+    qmlRegisterType<toolbar::ToolbarItem> ( "me.inputmethod.toolbar", 1, 0, "ToolbarItem" ) ;
+    qmlRegisterType<toolbar::ToolbarIcon> ( "me.inputmethod.toolbar", 1, 0, "ToolbarIcon" ) ;
 }
 
 Plugin::~Plugin() {

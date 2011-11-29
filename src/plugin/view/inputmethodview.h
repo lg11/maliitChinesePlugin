@@ -8,6 +8,10 @@ namespace engine {
 class Engine ;
 }
 
+namespace toolbar {
+class ToolbarData ;
+}
+
 namespace inputmethod {
 
 class InputMethodViewPrivate ;
@@ -23,6 +27,7 @@ public :
     void load( const QString& path ) ;
     void setInputMethod( MAbstractInputMethod* inputmethod ) ;
     void setEngine( engine::Engine* engine ) ;
+    void setToolbarData( toolbar::ToolbarData* toolbarData ) ;
     const QRect& screenRect( QWidget* widget = 0 ) ;
 
 private :

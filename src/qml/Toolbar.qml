@@ -1,6 +1,5 @@
 import QtQuick 1.1
-/*import me.inputmethod 1.0*/
-/*import me.inputmethod.toolbar 1.0*/
+import me.inputmethod.toolbar 1.0
 
 Item {
     width : parent.width

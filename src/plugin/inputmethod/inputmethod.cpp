@@ -3,15 +3,17 @@
 #include "engine.h"
 #include "keyfilter.h"
 #include "symbolmap.h"
+#include "toolbardata.h"
 
 #include <QRect>
 #include <QRegion>
 #include <QKeyEvent>
+#include <QEvent>
 
 #include <mabstractinputmethodhost.h>
-//#include <mtoolbardata.h>
-//#include <mtoolbaritem.h>
-//#include <mtoolbarlayout.h>
+#include <mtoolbardata.h>
+#include <mtoolbaritem.h>
+#include <mtoolbarlayout.h>
 
 #include <QDebug>
 
@@ -31,13 +33,15 @@ public :
     QRect inputMethodArea ;
     int appOrientation ;
     QRect cursorRect ;
+    MInputMethod::HandlerState state ;
+    bool useHardwareKeyboard ;
     QList<MInputMethod::PreeditTextFormat> preeditFormat ;
     engine::Engine* engine ;
     KeyFilter* keyFilter ;
     SymbolMap* symbolMap ;
     SymbolMap* stickySymbol[5] ;
     QHash<QString, int> stickyHash ;
-    //toolbar::Data* toolbarData ;
+    toolbar::ToolbarData* toolbarData ;
     QString debugString ;
     
     InputMethodPrivate( QWidget* mainWindow ) :
@@ -45,12 +49,14 @@ public :
         inputMethodArea() ,
         appOrientation( 0 ) ,
         cursorRect() ,
+        state( MInputMethod::OnScreen ) ,
+        useHardwareKeyboard( false ) ,
         preeditFormat() ,
         engine( new engine::Engine() ) ,
         keyFilter( new KeyFilter() ) ,
         symbolMap( new SymbolMap() ) ,
         stickyHash() ,
-        //toolbarData( new toolbar::Data() ) ,
+        toolbarData( new toolbar::ToolbarData() ) ,
         debugString()
     {
         //ok = connect(imToolbar, SIGNAL(copyPasteRequest(CopyPasteState)),
@@ -71,7 +77,6 @@ public :
 
         this->preeditFormat.append( MInputMethod::PreeditTextFormat( 0, 0, MInputMethod::PreeditDefault ) ) ;
         this->preeditFormat.append( MInputMethod::PreeditTextFormat( 0, 0, MInputMethod::PreeditNoCandidates ) ) ;
-        //this->engine->rootContext()->setContextProperty( "toolbarData", this->toolbarData ) ;
         
         this->stickySymbol[MASK_SHIFT] = new SymbolMap() ;
         this->stickySymbol[MASK_CTRL] = new SymbolMap() ;
@@ -96,7 +101,7 @@ public :
         delete this->stickySymbol[MASK_ALT] ;
         delete this->stickySymbol[MASK_FN] ;
         delete this->stickySymbol[MASK_META] ;
-        //delete this->toolbarData ;
+        delete this->toolbarData ;
     }
 } ;
 
@@ -110,6 +115,7 @@ InputMethod::InputMethod( MAbstractInputMethodHost *host, QWidget *mainWindow ) 
     Q_D( InputMethod ) ;
     d->view->setInputMethod( this ) ;
     d->view->setEngine( d->engine ) ;
+    d->view->setToolbarData( d->toolbarData ) ;
     d->view->load( "/opt/linputmethod/qml/main.qml" ) ;
     //qDebug() << d->engine ;
 
@@ -201,15 +207,15 @@ void InputMethod::handleAppOrientationChanged( int angle) {
     
     if ( d->appOrientation != angle ) {
         d->appOrientation = angle ;
-        //d->toolbarData->setOrientation( angle ) ;
+        d->toolbarData->setOrientation( angle ) ;
         emit this->appOrientationChanged( d->appOrientation ) ;
     }
 }
 void InputMethod::setToolbar( QSharedPointer<const MToolbarData> toolbar ) {
     qDebug() << "inputmethod" << "setToolbar" ;
-    //Q_D( InputMethod ) ;
+    Q_D( InputMethod ) ;
     if ( toolbar ) {
-        //d->toolbarData->set( toolbar ) ;
+        d->toolbarData->set( toolbar ) ;
     }
 }
 
@@ -264,7 +270,19 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
 }
 void InputMethod::setState( const QSet<MInputMethod::HandlerState> &state ) {
     qDebug() << "inputmethod" << "setState" ;
-    Q_UNUSED( state )
+    Q_D( InputMethod ) ;
+    if ( state.contains( MInputMethod::Hardware ) ) {
+        if ( !d->useHardwareKeyboard ) {
+            d->useHardwareKeyboard = true ;
+            emit this->useHardwareKeyboardChanged( true ) ;
+        }
+    }
+    else {
+        if ( d->useHardwareKeyboard ) {
+            d->useHardwareKeyboard = false ;
+            emit this->useHardwareKeyboardChanged( false ) ;
+        }
+    }
 }
 
 void InputMethod::handleClientChange() {
@@ -336,6 +354,11 @@ int InputMethod::appOrientation() const {
 const QRect& InputMethod::cursorRect() const {
     Q_D( const InputMethod ) ;
     return d->cursorRect ;
+}
+
+bool InputMethod::useHardwareKeyboard() const {
+    Q_D( const InputMethod ) ;
+    return d->useHardwareKeyboard ;
 }
 
 const QString& InputMethod::debugString() const {
@@ -443,6 +466,10 @@ void InputMethod::sendCommit( const QString& text ) {
     } else {
         this->inputMethodHost()->sendCommitString( text ) ;
     }
+}
+
+void InputMethod::processKeyEvent( int keyType, int keyCode, int modifiers, const QString& text, bool autoRepeat, int count ) {
+    this->processKeyEvent( (QEvent::Type)keyType, (Qt::Key)keyCode, (Qt::KeyboardModifier)modifiers, text, autoRepeat, count, 0, 0, 0 ) ;
 }
 
 

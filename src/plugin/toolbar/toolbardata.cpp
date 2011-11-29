@@ -1,23 +1,23 @@
-#include "data.h"
+#include "toolbardata.h"
 
 #include <mtoolbarlayout.h>
 #include <mtoolbaritem.h>
 
 #include <QDebug>
 #include <QIcon>
-#include <MTheme>
+//#include <MTheme>
 
 #include <QSharedPointer>
 
 namespace toolbar {
 
-class DataPrivate {
+class ToolbarDataPrivate {
 public :
     QSharedPointer<const MToolbarData> ptr ;
     MInputMethod::Orientation orientation ;
-    QList<Item*>* items ;
-    DataPrivate() : ptr( 0 ), orientation( MInputMethod::Landscape ), items( new QList<Item*>() ) {}
-    ~DataPrivate() {
+    QList<ToolbarItem*>* items ;
+    ToolbarDataPrivate() : ptr( 0 ), orientation( MInputMethod::Landscape ), items( new QList<ToolbarItem*>() ) {}
+    ~ToolbarDataPrivate() {
         for ( int i = 0 ;  i < this->items->length() ; i++ )
             delete this->items->at(i) ;
         this->items->clear() ;
@@ -25,38 +25,38 @@ public :
     }
 } ;
 
-Data::Data( QObject* parent ) : \
+ToolbarData::ToolbarData( QObject* parent ) : \
     QObject( parent ), \
-    d_ptr( new DataPrivate() )
+    d_ptr( new ToolbarDataPrivate() )
 {
 }
 
-Data::~Data() {
+ToolbarData::~ToolbarData() {
     delete this->d_ptr ;
 }
 
-QDeclarativeListProperty<toolbar::Item> Data::items() {
-    Q_D( Data ) ;
-    return QDeclarativeListProperty<Item>( this, *(d->items) ) ;
+QDeclarativeListProperty<toolbar::ToolbarItem> ToolbarData::items() {
+    Q_D( ToolbarData ) ;
+    return QDeclarativeListProperty<toolbar::ToolbarItem>( this, *(d->items) ) ;
 }
 
-void Data::set( QSharedPointer<const MToolbarData> data ) {
-    Q_D( Data ) ;
+void ToolbarData::set( QSharedPointer<const MToolbarData> data ) {
+    Q_D( ToolbarData ) ;
     if ( d->ptr != data ) {
         d->ptr = data ;
         this->updata() ;
     }
 }
 
-void Data::setOrientation( MInputMethod::Orientation orientation ) {
-    Q_D( Data ) ;
+void ToolbarData::setOrientation( MInputMethod::Orientation orientation ) {
+    Q_D( ToolbarData ) ;
     if ( d->orientation != orientation ) {
         d->orientation = orientation ;
         this->updata() ;
     }
 }
 
-void Data::setOrientation( int angle ) {
+void ToolbarData::setOrientation( int angle ) {
     switch( angle ) {
         case 0 :
             this->setOrientation( MInputMethod::Landscape ) ;
@@ -75,8 +75,8 @@ void Data::setOrientation( int angle ) {
     }
 }
 
-inline Item* create_item( QSharedPointer<MToolbarItem> item ) {
-    Item* new_item = new Item() ;
+inline ToolbarItem* create_item( QSharedPointer<MToolbarItem> item ) {
+    ToolbarItem* new_item = new ToolbarItem() ;
 
     if (item->alignment() == Qt::AlignLeft)
         new_item->setAlignment( Qt::AlignLeft | Qt::AlignVCenter ) ;
@@ -128,8 +128,8 @@ inline Item* create_item( QSharedPointer<MToolbarItem> item ) {
     return new_item ;
 }
 
-void Data::updata() {
-    Q_D( Data ) ;
+void ToolbarData::updata() {
+    Q_D( ToolbarData ) ;
     if ( d->ptr ) {
         QSharedPointer<const MToolbarLayout> layout = d->ptr->layout( d->orientation ) ;
 

@@ -1,13 +1,13 @@
-#ifndef ITEM_H
-#define ITEM_H
+#ifndef TOOLBARITEM_H
+#define TOOLBARITEM_H\
 
 #include <QObject>
 
 namespace toolbar {
 
-class ItemPrivate ;
+class ToolbarItemPrivate ;
 
-class Item : public QObject {
+class ToolbarItem : public QObject {
     Q_OBJECT
     Q_PROPERTY( QString text READ getText WRITE setText NOTIFY textChanged )
     Q_PROPERTY( QString iconId READ getIconId WRITE setIconId NOTIFY iconIdChanged )
@@ -23,8 +23,8 @@ signals :
     void alignmentChanged( Qt::Alignment ) ;
 
 public :
-    explicit Item( QObject* parent = 0 ) ;
-    ~Item() ;
+    explicit ToolbarItem( QObject* parent = 0 ) ;
+    ~ToolbarItem() ;
 
     const QString& getText() const ;
     void setText( const QString& text ) ;
@@ -38,11 +38,11 @@ public :
     void setAlignment( Qt::Alignment alignment ) ;
 
 private :
-    Q_DISABLE_COPY( Item ) ;
-    Q_DECLARE_PRIVATE( Item ) ;
-    ItemPrivate* const d_ptr ;
+    Q_DISABLE_COPY( ToolbarItem ) ;
+    Q_DECLARE_PRIVATE( ToolbarItem ) ;
+    ToolbarItemPrivate* const d_ptr ;
 } ;
 
 }
 
-#endif // ITEM_H
+#endif // TOOLBARITEM_H

@@ -2,7 +2,7 @@ import QtQuick 1.1
 import me.inputmethod.toolbar 1.0
 import me.utils.toucharea 1.0
 
-BaseButton {
+BaseKey {
     property alias iconId : icon.iconId
     property alias iconPath : icon.iconPath
     property alias text : label.text
@@ -23,14 +23,14 @@ BaseButton {
         font.pixelSize : 22
     }
 
-    FakeTouchArea {
-        id : input
-        anchors.fill : parent
-    }
+    /*FakeTouchArea {*/
+        /*id : input*/
+        /*anchors.fill : parent*/
+    /*}*/
     
     Component.onCompleted : {
-        input.entered.connect( handleEntered )
-        input.exited.connect( handleExited )
-        input.released.connect( handleReleased )
+        /*input.entered.connect( handleEntered )*/
+        /*input.exited.connect( handleExited )*/
+        /*input.released.connect( handleReleased )*/
     }
 }

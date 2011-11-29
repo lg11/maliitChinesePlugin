@@ -1,66 +1,76 @@
 import QtQuick 1.1
 import me.utils.toucharea 1.0
+import me.inputmethod 1.0
 
-/*import me.inputmethod 1.0*/
 /*import me.inputmethod.toolbar 1.0*/
 
 
-Rectangle {
-    /*FakeInputMethod { id : inputmethod ; anchors.fill : parent }*/
-    /*Engine { id : engine ; objectName : "engine" }*/
-    id : canvas
-    transformOrigin: Item.Center
+Item {
+    id : root
     width : inputmethod.screenWidth
     height : inputmethod.screenHeight
-    color : "transparent"
 
-    Style { id : style }
-
-    EditToolBar {}
-
-    RootTouchArea {
-        id : root
+    Rectangle {
+        /*FakeInputMethod { id : inputmethod ; anchors.fill : parent }*/
+        /*Engine { id : engine ; objectName : "engine" }*/
+        id : canvas
         anchors.centerIn : parent
         transformOrigin: Item.Center
-        width : canvas.width
-        height : canvas.height
-        Rectangle {
-            id : panel
-            anchors.bottom : parent.bottom
-            width : parent.width
-            height : parent.height / 2
-            color : "transparent"
-            FullKeyboard {
-                visible : false
-                anchors.fill : parent
+        width : root.width
+        height : root.height
+        color : "transparent"
+
+        Style { id : style }
+
+        EditToolBar {}
+
+        RootTouchArea {
+            anchors.fill : parent
+            Rectangle {
+                id : panel
+                anchors.bottom : parent.bottom
+                width : canvas.width
+                /*height : toolbar.height + keyboard.height*/
+                height : keyboard.height
+                color : "white"
+                FullKeyboard {
+                    id : keyboard
+                    visible : !inputmethod.useHardwareKeyboard
+                    /*visible : false*/
+                    anchors.bottom : parent.bottom
+                    width : canvas.width
+                    height : canvas.height / 2
+                }
+                /*Toolbar {*/
+                    /*id : toolbar*/
+                    /*anchors.top : parent.top*/
+                    /*anchors.horizontalCenter : parent.horizontalCenter*/
+                    /*height : 0*/
+                /*}*/
             }
-            /*Toolbar {*/
-                /*id : toolbar*/
-                /*anchors.top : parent.top */
-                /*anchors.horizontalCenter : parent.horizontalCenter*/
-            /*}*/
         }
+
     }
 
     function handleAppOrientationChanged( angle ) {
-        root.rotation = angle
+        canvas.rotation = angle
         if ( angle == 0 ) {
-            root.width = canvas.width
-            root.height = canvas.height
-            var pos = root.mapToItem( canvas, panel.x, panel.y )
+            canvas.width = root.width
+            canvas.height = root.height
+            var pos = canvas.mapToItem( root, panel.x, panel.y )
             inputmethod.setInputMethodArea( Qt.rect( pos.x, pos.y, panel.width, panel.height ) )
         }
         else if ( angle == 270 ) {
-            root.width = canvas.height
-            root.height = canvas.width
-            var pos = root.mapToItem( canvas, panel.x + panel.width, panel.y )
+            canvas.width = root.height
+            canvas.height = root.width
+            var pos = canvas.mapToItem( root, panel.x + panel.width, panel.y )
             inputmethod.setInputMethodArea( Qt.rect( pos.x, pos.y, panel.height, panel.width ) )
         }
     }
 
     Component.onCompleted : {
-        inputmethod.setInputMethodArea( Qt.rect( 0, 0, 1, 1 ) )
-        /*inputmethod.setInputMethodArea( Qt.rect( panel.x, panel.y, panel.width, panel.height ) )*/
+        /*inputmethod.setInputMethodArea( Qt.rect( 0, 0, 1, 1 ) )*/
+        inputmethod.setInputMethodArea( Qt.rect( panel.x, panel.y, panel.width, panel.height ) )
         inputmethod.appOrientationChanged.connect( handleAppOrientationChanged )
         /*toolbarData.updated.connect( toolbar.update )*/
         console.log( "load start" )
@@ -144,17 +154,24 @@ Rectangle {
         engine.remapPunc( "'", "‘" )
         engine.remapPunc( "\"", "“" )
 
-        /*engine.setFunctionKey( "CANDIDATE_1", Qt.Key_Space )*/
-        /*engine.setFunctionKey( "CANDIDATE_2", Qt.Key_Question )*/
-        /*engine.setFunctionKey( "CANDIDATE_3", Qt.Key_Left )*/
-        /*engine.setFunctionKey( "CANDIDATE_4", Qt.Key_Down )*/
-        /*engine.setFunctionKey( "CANDIDATE_5", Qt.Key_Right )*/
-        /*engine.setFunctionKey( "NEXT_PAGE", Qt.Key_Period )*/
-        /*engine.setFunctionKey( "PREV_PAGE", Qt.Key_Comma )*/
+        engine.setFunctionKey( "CANDIDATE_1", Qt.Key_Space )
+        engine.setFunctionKey( "CANDIDATE_2", Qt.Key_Question )
+        engine.setFunctionKey( "CANDIDATE_3", Qt.Key_Left )
+        engine.setFunctionKey( "CANDIDATE_4", Qt.Key_Down )
+        engine.setFunctionKey( "CANDIDATE_5", Qt.Key_Right )
+        engine.setFunctionKey( "NEXT_PAGE", Qt.Key_Period )
+        engine.setFunctionKey( "PREV_PAGE", Qt.Key_Comma )
 
         console.log( inputmethod.screenWidth, inputmethod.screenHeight )
 
         engine.commit.connect( inputmethod.sendCommit )
+    }
+
+    Connections {
+        target : inputmethod
+        onAppOrientationChanged : {
+            handleAppOrientationChanged( angle ) ;
+        }
     }
 
 }

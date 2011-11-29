@@ -1,10 +1,10 @@
-#include "item.h"
+#include "toolbaritem.h"
 
 #include <mtoolbaritem.h>
 
 namespace toolbar {
 
-class ItemPrivate {
+class ToolbarItemPrivate {
 public :
     MToolbarItem* item ;
     QString text ;
@@ -12,7 +12,7 @@ public :
     QString iconPath ;
     int size ;
     Qt::Alignment alignment ;
-    ItemPrivate() : \
+    ToolbarItemPrivate() : \
         item( 0 ), \
         text(), \
         iconId(), \
@@ -21,36 +21,36 @@ public :
         alignment( Qt::AlignCenter )
     {
     }
-    ~ItemPrivate() {}
+    ~ToolbarItemPrivate() {}
 } ;
 
-Item::Item( QObject* parent ) : QObject( parent ), d_ptr( new ItemPrivate() ) {
+ToolbarItem::ToolbarItem( QObject* parent ) : QObject( parent ), d_ptr( new ToolbarItemPrivate() ) {
 }
 
-Item::~Item() {
+ToolbarItem::~ToolbarItem() {
     delete this->d_ptr ;
 }
 
-const QString& Item::getText() const {
-    Q_D( const Item ) ;
+const QString& ToolbarItem::getText() const {
+    Q_D( const ToolbarItem ) ;
     return d->text ;
 }
 
-void Item::setText( const QString& text ) {
-    Q_D( Item ) ;
+void ToolbarItem::setText( const QString& text ) {
+    Q_D( ToolbarItem ) ;
     if ( d->text != text ) {
         d->text = text ;
         emit this->textChanged( d->text ) ;
     }
 }
 
-const QString& Item::getIconId() const {
-    Q_D( const Item ) ;
+const QString& ToolbarItem::getIconId() const {
+    Q_D( const ToolbarItem ) ;
     return d->iconId ;
 }
 
-void Item::setIconId( const QString& iconId ) {
-    Q_D( Item ) ;
+void ToolbarItem::setIconId( const QString& iconId ) {
+    Q_D( ToolbarItem ) ;
     if ( d->iconId != iconId ) {
         if ( !d->iconPath.isEmpty() ) {
             d->iconPath.clear() ;
@@ -61,13 +61,13 @@ void Item::setIconId( const QString& iconId ) {
     }
 }
 
-const QString& Item::getIconPath() const {
-    Q_D( const Item ) ;
+const QString& ToolbarItem::getIconPath() const {
+    Q_D( const ToolbarItem ) ;
     return d->iconPath ;
 }
 
-void Item::setIconPath( const QString& iconPath ) {
-    Q_D( Item ) ;
+void ToolbarItem::setIconPath( const QString& iconPath ) {
+    Q_D( ToolbarItem ) ;
     if ( d->iconPath != iconPath ) {
         if ( !d->iconId.isEmpty() ) {
             d->iconId.clear() ;
@@ -78,26 +78,26 @@ void Item::setIconPath( const QString& iconPath ) {
     }
 }
 
-int Item::getSize() const {
-    Q_D( const Item ) ;
+int ToolbarItem::getSize() const {
+    Q_D( const ToolbarItem ) ;
     return d->size ;
 }
 
-void Item::setSize( int size ) {
-    Q_D( Item ) ;
+void ToolbarItem::setSize( int size ) {
+    Q_D( ToolbarItem ) ;
     if ( d->size != size ) {
         d->size = size ;
         emit this->sizeChanged( d->size ) ;
     }
 }
 
-Qt::Alignment Item::getAlignment() const {
-    Q_D( const Item ) ;
+Qt::Alignment ToolbarItem::getAlignment() const {
+    Q_D( const ToolbarItem ) ;
     return d->alignment ;
 }
 
-void Item::setAlignment( Qt::Alignment alignment ) {
-    Q_D( Item ) ;
+void ToolbarItem::setAlignment( Qt::Alignment alignment ) {
+    Q_D( ToolbarItem ) ;
     alignment = alignment & ( Qt::AlignLeft | Qt::AlignRight ) ;
     if ( d->alignment != alignment ) {
         d->alignment = alignment ;

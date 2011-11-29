@@ -56,12 +56,8 @@ Item {
         event.accepted = processKeyEvent( event.key, event.modifiers )
     }
 
-    function processKeyEvent( keycode, modifiers ) {
-        var flag = engine.processKeyEvent( keycode )
-        if ( !flag ) {
-            if ( keycode == Qt.Key_Backspace )
-                inputmethod.backspace()
-        }
-        return flag
+    function processKeyEvent( type, keycode, modifiers, text ) {
+        inputmethod.processKeyEvent( type, keycode, modifiers, text, false, 0 ) ;
+        /*inputmethod.processKeyEvent( type, keycode, modifiers, text, autoRepeat, count  ) ;*/
     }
 }

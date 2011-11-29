@@ -14,7 +14,7 @@ BaseKey {
             id : label
             text : keydata.keysym[keycode][0]
             anchors.centerIn : parent
-            font.pixelSize : 22
+            font.pixelSize : 26
             font.bold : true
             textFormat : Text.PlainText
             color : "white"
@@ -25,11 +25,14 @@ BaseKey {
         State {
             name : "PRESSED"
             when : ( pressed )
-            PropertyChanges { target : bgRect ; color : "blue" }
+            PropertyChanges { target : bgRect ; color : "cornflowerblue" }
         }
     ]
 
+    onPressed : {
+        keyboard.processKeyEvent( 6, keycode, 0, label.text )
+    }
     onReleased : {
-        keyboard.processKeyEvent( keycode, 0 )
+        keyboard.processKeyEvent( 7, keycode, 0, label.text )
     }
 }

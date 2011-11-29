@@ -1,5 +1,6 @@
 #include "inputmethodview.h"
 #include "engine.h"
+#include "toolbardata.h"
 
 #include <QGraphicsScene>
 #include <QDeclarativeEngine>
@@ -81,6 +82,11 @@ void InputMethodView::setInputMethod( MAbstractInputMethod* inputmethod ) {
 void InputMethodView::setEngine( engine::Engine* engine ) {
     Q_D( InputMethodView ) ;
     d->engine->rootContext()->setContextProperty( "engine", engine ) ;
+}
+
+void InputMethodView::setToolbarData( toolbar::ToolbarData* toolbarData ) {
+    Q_D( InputMethodView ) ;
+    d->engine->rootContext()->setContextProperty( "toolbarData", toolbarData ) ;
 }
 
 const QRect& InputMethodView::screenRect( QWidget* widget ) {

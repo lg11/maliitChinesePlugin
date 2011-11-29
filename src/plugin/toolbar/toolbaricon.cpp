@@ -1,19 +1,19 @@
-#include "icon.h"
+#include "toolbaricon.h"
 
 #include <QPixmap>
 
-#include <MTheme>
+//#include <MTheme>
 
 namespace toolbar {
 
-class IconPrivate {
+class ToolbarIconPrivate {
 public :
     const QPixmap* pixmap ;
     QString iconId ;
     QString iconPath ;
     qreal paintedWidth ;
     qreal paintedHeight ;
-    IconPrivate() :
+    ToolbarIconPrivate() :
         pixmap( 0 ) ,
         iconId() ,
         iconPath() ,
@@ -25,7 +25,7 @@ public :
         if ( this->pixmap ) {
             if ( !this->iconId.isEmpty() ) {
                 this->iconId.clear() ;
-                MTheme::releasePixmap( this->pixmap ) ;
+                //MTheme::releasePixmap( this->pixmap ) ;
             }
             else if ( !this->iconPath.isEmpty() ) {
                 this->iconPath.clear() ;
@@ -34,24 +34,24 @@ public :
             this->pixmap = 0 ;
         }
     }
-    ~IconPrivate() {
+    ~ToolbarIconPrivate() {
         this->releasePixmap() ;
     }
 } ;
 
-Icon::Icon( QDeclarativeItem* parent ) : \
+ToolbarIcon::ToolbarIcon( QDeclarativeItem* parent ) : \
         QDeclarativeItem( parent ), \
-        d_ptr( new IconPrivate )
+        d_ptr( new ToolbarIconPrivate )
 {
     this->setFlag( QGraphicsItem::ItemHasNoContents, false) ;
 }
 
-Icon::~Icon() {
+ToolbarIcon::~ToolbarIcon() {
     delete this->d_ptr ;
 }
 
-void Icon::checkPaintedSize() {
-    Q_D( Icon ) ;
+void ToolbarIcon::checkPaintedSize() {
+    Q_D( ToolbarIcon ) ;
     qreal paintedWidth = 0 ;
     qreal paintedHeight = 0 ;
     if ( d->pixmap ) {
@@ -68,30 +68,30 @@ void Icon::checkPaintedSize() {
     }
 }
 
-const QString& Icon::getIconId() const {
-    Q_D( const Icon ) ;
+const QString& ToolbarIcon::getIconId() const {
+    Q_D( const ToolbarIcon ) ;
     return d->iconId ;
 }
 
-void Icon::setIconId( const QString& iconId ) {
-    Q_D( Icon ) ;
+void ToolbarIcon::setIconId( const QString& iconId ) {
+    Q_D( ToolbarIcon ) ;
     if ( d->iconId != iconId ) {
         d->releasePixmap() ;
         d->iconId = iconId ;
         if ( !d->iconId.isEmpty() ) {
-            d->pixmap = MTheme::pixmap( iconId, QSize( 32, 32 ) ) ;
+            //d->pixmap = MTheme::pixmap( iconId, QSize( 32, 32 ) ) ;
         }
         this->checkPaintedSize() ;
     }
 }
 
-const QString& Icon::getIconPath() const {
-    Q_D( const Icon ) ;
+const QString& ToolbarIcon::getIconPath() const {
+    Q_D( const ToolbarIcon ) ;
     return d->iconPath ;
 }
 
-void Icon::setIconPath( const QString& iconPath ) {
-    Q_D( Icon ) ;
+void ToolbarIcon::setIconPath( const QString& iconPath ) {
+    Q_D( ToolbarIcon ) ;
     if ( d->iconPath != iconPath ) {
         d->releasePixmap() ;
         d->iconPath = iconPath ;
@@ -102,19 +102,19 @@ void Icon::setIconPath( const QString& iconPath ) {
     }
 }
 
-qreal Icon::getPaintedWidth() const {
-    Q_D( const Icon ) ;
+qreal ToolbarIcon::getPaintedWidth() const {
+    Q_D( const ToolbarIcon ) ;
     return d->paintedWidth ;
 }
 
-qreal Icon::getPaintedHeight() const {
-    Q_D( const Icon ) ;
+qreal ToolbarIcon::getPaintedHeight() const {
+    Q_D( const ToolbarIcon ) ;
     return d->paintedHeight ;
 }
 
 
-void Icon::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget ) {
-    Q_D( const Icon ) ;
+void ToolbarIcon::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget ) {
+    Q_D( const ToolbarIcon ) ;
     Q_UNUSED( option )
     Q_UNUSED( widget )
     //qDebug() << "icon_paint" ;

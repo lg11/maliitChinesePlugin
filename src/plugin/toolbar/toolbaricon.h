@@ -1,14 +1,14 @@
-#ifndef ICON_H
-#define ICON_H
+#ifndef TOOLBARICON_H
+#define TOOLBARICON_H
 
 #include <QDeclarativeItem>
 #include <QPainter>
 
 namespace toolbar {
 
-class IconPrivate ;
+class ToolbarIconPrivate ;
 
-class Icon : public QDeclarativeItem {
+class ToolbarIcon : public QDeclarativeItem {
     Q_OBJECT
     Q_PROPERTY( QString iconId READ getIconId WRITE setIconId )
     Q_PROPERTY( QString iconPath READ getIconPath WRITE setIconPath )
@@ -19,8 +19,8 @@ signals :
     void paintedWidthChanged( qreal paintedWidth ) ;
     void paintedHeightChanged( qreal paintedHeight ) ;
 public :
-    explicit Icon( QDeclarativeItem* parent = 0 ) ;
-    ~Icon() ;
+    explicit ToolbarIcon( QDeclarativeItem* parent = 0 ) ;
+    ~ToolbarIcon() ;
     void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) ;
 
     void checkPaintedSize() ;
@@ -30,15 +30,13 @@ public :
     void setIconPath( const QString& iconPath ) ;
     qreal getPaintedWidth() const ;
     qreal getPaintedHeight() const ;
-public slots :
-    //void setPath( const QString& path ) ;
 
 private :
-    Q_DISABLE_COPY( Icon ) ;
-    Q_DECLARE_PRIVATE( Icon ) ;
-    IconPrivate* d_ptr ;
+    Q_DISABLE_COPY( ToolbarIcon ) ;
+    Q_DECLARE_PRIVATE( ToolbarIcon ) ;
+    ToolbarIconPrivate* d_ptr ;
 } ;
 
 }
 
-#endif // ICON_H
+#endif // TOOLBARICON_H
