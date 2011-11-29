@@ -66,8 +66,6 @@ public slots:
     void unramapSymbol( const QString& src ) ;
     void remapStickySymbol( const QString& mask, const QString& src, const QString& dest ) ;
     void unremapStickySymbol( const QString& mask, const QString& src ) ;
-    void remapPunc( const QString& src, const QString& dest ) ;
-    void unramapPunc( const QString& src ) ;
 
     void setScreenRegion( const QRect &area ) ;
     void setInputMethodArea( const QRect &area ) ;

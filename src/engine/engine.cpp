@@ -1,11 +1,12 @@
 #include "engine.h"
 #include "worker.h"
+#include "puncmap.h"
 
 #include <QList>
 #include <QString>
 #include <QHash>
 
-//#include <QDebug>
+#include <QDebug>
 
 namespace engine {
 
@@ -29,14 +30,17 @@ public :
     bool active ;
     bool working ;
     int functionKey[16] ;
+    PuncMap* puncMap ;
     QHash<QString, int> hash ;
     EnginePrivate() :
         worker( new Worker() ) , 
         pageLength( 5 ) ,
         active( false ) ,
         working( false ) ,
+        puncMap( new PuncMap() ) ,
         hash()
     {
+        qDebug() << "init engine" ;
         this->hash.insert( "CANDIDATE_SPACE", CANDIDATE_SPACE ) ;
         this->hash.insert( "CANDIDATE_1", CANDIDATE_1 ) ;
         this->hash.insert( "CANDIDATE_2", CANDIDATE_2 ) ;
@@ -63,6 +67,7 @@ public :
     }
     ~EnginePrivate() {
         delete this->worker ;
+        delete this->puncMap ;
     }
 } ;
 
@@ -209,5 +214,21 @@ QString Engine::getCandidateString() {
     //qDebug() << str ;
     return str ;
 }
+
+const QString* Engine::convertPunc( const QString& src ) {
+    Q_D( Engine ) ;
+    return d->puncMap->remap( src[0] ) ;
+}
+
+void Engine::remapPunc( const QString& src, const QString& dest ) {
+    Q_D( Engine ) ;
+    d->puncMap->setRemap( src[0], dest ) ;
+}
+
+void Engine::unramapPunc( const QString& src ) {
+    Q_D( Engine ) ;
+    d->puncMap->unsetRemap( src[0] ) ;
+}
+
 
 }

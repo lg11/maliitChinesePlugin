@@ -2,14 +2,12 @@
 #define TRIE_H
 
 #include <QString>
-#include <QStack>
 #include <QList>
 #include <QPair>
 
 //#include <QDebug>
 
 namespace trie {
-
 
 typedef QPair< QSet<QString>, QList<int> > NodePair ;
 typedef QPair< QChar, NodePair > Node ;

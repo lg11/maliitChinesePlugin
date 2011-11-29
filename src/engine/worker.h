@@ -11,10 +11,12 @@
 
 namespace lookup {
 class Lookup ;
+class PinyinLookup ;
+class T9Lookup ;
 }
 
-namespace t9 {
-class T9Lookup ;
+namespace dict {
+class Dictionary ;
 }
 
 namespace engine {
@@ -33,9 +35,11 @@ public:
     //Q_ENUMS( KeyboardLayout )
     enum KeyboardLayout { UnknownKeyboardLayout = 0, FullKeyboardLayout = 1, T9KeyboardLayout = 2 } ;
 
+    dict::Dictionary* dict ;
     lookup::Lookup* lookup ;
-    t9::T9Lookup* t9lookup ;
-    SelectedPair selected ;
+    lookup::PinyinLookup* pinyinLookup ;
+    lookup::T9Lookup* t9Lookup ;
+    SelectedPair* selected ;
     QString* selectedWord ;
     int pageStartIndex ;
     const Candidate* candidate ;

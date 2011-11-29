@@ -9,15 +9,15 @@ unix {
         CONFIG += meegoimquick
     }
     else {
-        CONFIG += meegoimframework
-        CONFIG += meegotouch
-        CONFIG += meegoimquick
+        #CONFIG += meegoimframework
+        #CONFIG += meegotouch
+        #CONFIG += meegoimquick
 
-        #CONFIG += link_pkgconfig
-        #PKGCONFIG += maliit-plugins-0.80
-        #target.path += $$system(pkg-config --variable pluginsdir maliit-plugins-0.80)
-        #INCLUDEPATH += $$system(pkg-config --cflags maliit-plugins-0.80 | tr \' \' \'\\n\' | grep ^-I | cut -d I -f 2-)
-        #INSTALLS += target
+        CONFIG += link_pkgconfig
+        PKGCONFIG += maliit-plugins-0.80
+        target.path += $$system(pkg-config --variable pluginsdir maliit-plugins-0.80)
+        INCLUDEPATH += $$system(pkg-config --cflags maliit-plugins-0.80 | tr \' \' \'\\n\' | grep ^-I | cut -d I -f 2-)
+        INSTALLS += target
     }
 }
 
@@ -29,12 +29,13 @@ TARGET = linputmethod
 OBJECTS_DIR = .tmp
 MOC_DIR = .tmp
 
-INCLUDEPATH += ./inputmethod ./settings ./view ./engine
+INCLUDEPATH += ./inputmethod ./settings ./view ./engine ../lookup
 
 HEADERS += \
 	plugin.h \
-	./engine/engine.h \
 	./engine/worker.h \
+	./engine/puncmap.h \
+	./engine/engine.h \
 	./inputmethod/keyfilter.h \
 	./inputmethod/symbolmap.h \
 	./inputmethod/inputmethod.h \

@@ -3,9 +3,9 @@ import QtQuick 1.1
 Rectangle {
     property alias text : label.text
     visible : text.length > 0
-    color : "gray"
-    height : label.paintedHeight + 4
-    width : label.paintedWidth + 16
+    color : "cornflowerblue"
+    height : label.paintedHeight + 8
+    width : label.paintedWidth + 24
     Text {
         id : label
         color : "white"

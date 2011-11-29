@@ -35,6 +35,10 @@ public slots :
     bool processKeyEvent( QEvent::Type type, int keycode, Qt::KeyboardModifiers modifiers, const QString& text, bool autoRepeat, int count ) ;
     QString getCandidateString() ;
 
+    const QString* convertPunc( const QString& src ) ;
+    void remapPunc( const QString& src, const QString& dest ) ;
+    void unramapPunc( const QString& src ) ;
+
 private :
     Q_DISABLE_COPY( Engine ) ;
     Q_DECLARE_PRIVATE( Engine ) ;

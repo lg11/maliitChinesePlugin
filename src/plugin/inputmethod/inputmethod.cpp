@@ -37,7 +37,6 @@ public :
     SymbolMap* symbolMap ;
     SymbolMap* stickySymbol[5] ;
     QHash<QString, int> stickyHash ;
-    SymbolMap* puncMap ;
     //toolbar::Data* toolbarData ;
     QString debugString ;
     
@@ -51,7 +50,6 @@ public :
         keyFilter( new KeyFilter() ) ,
         symbolMap( new SymbolMap() ) ,
         stickyHash() ,
-        puncMap( new SymbolMap() ) ,
         //toolbarData( new toolbar::Data() ) ,
         debugString()
     {
@@ -98,7 +96,6 @@ public :
         delete this->stickySymbol[MASK_ALT] ;
         delete this->stickySymbol[MASK_FN] ;
         delete this->stickySymbol[MASK_META] ;
-        delete this->puncMap ;
         //delete this->toolbarData ;
     }
 } ;
@@ -255,7 +252,7 @@ void InputMethod::processKeyEvent( QEvent::Type keyType, Qt::Key keyCode, Qt::Ke
             }
             if ( d->engine->getActive() ) {
                 const QString* punc = 0 ;
-                punc = d->puncMap->remap( (*symbol)[0] ) ; 
+                punc = d->engine->convertPunc( *symbol ) ; 
                 if ( punc )
                     symbol = punc ;
             }
@@ -380,16 +377,6 @@ void InputMethod::unremapStickySymbol( const QString& mask, const QString& src )
         int index = d->stickyHash.value( mask ) ;
         d->stickySymbol[index]->unsetRemap( src[0] ) ;
     }
-}
-
-void InputMethod::remapPunc( const QString& src, const QString& dest ) {
-    Q_D( InputMethod ) ;
-    d->puncMap->setRemap( src[0], dest ) ;
-}
-
-void InputMethod::unramapPunc( const QString& src ) {
-    Q_D( InputMethod ) ;
-    d->puncMap->unsetRemap( src[0] ) ;
 }
 
 
